@@ -1,0 +1,129 @@
+**Product Requirements Document (PRD)**
+
+**Project Title:**
+Crypto Marketing Services Explorer + Lead Collector
+
+---
+
+**Objective:**
+Create a stylish, responsive web application that lets users explore categorized crypto marketing services, select those they are interested in, and submit their Telegram handle to express interest. No purchases will occur on-site.
+
+---
+
+**Target Users:**
+- Crypto project owners
+- Web3 marketing teams
+- Token launch specialists
+- Startup founders
+
+---
+
+**Core Features & Functional Flow:**
+
+### 1. **Homepage & Navigation**
+- Display clickable buttons/cards for each **main service category**:
+  - Listings
+  - Trendings
+  - PR
+  - DEX Boosts
+  - Botting
+  - Startup
+- Once a category is clicked, reveal services under it.
+- Each service should only display `Service Name` and `Price`. No extra info or description is needed.
+
+### 2. **Service Selection (Strategy Board)**
+- Clicking a service adds it to a persistent selection panel (the **"Strategy Board"**, not a shopping cart).
+- Allow users to remove items from the board.
+- Show a **live total cost** update as services are added/removed.
+
+### 3. **Prebuilt Packages**
+- Dedicated section for:
+  - Budget-Friendly Package
+  - Baller Package
+- Each package auto-populates the Strategy Board.
+- Automatically applies a **15% discount** to package total.
+- Let users remove or swap out items from packages.
+
+#### 💸 Budget-Friendly Package
+| Category     | Service                              | Price               |
+|--------------|---------------------------------------|---------------------|
+| Listings     | CoinGecko Listing                    | $950                |
+| Trendings    | GeckoTerminal Pool Trends            | $300                |
+| Trendings    | Dexscreener Boost – 30x              | $235                |
+| PR           | Reddit Campaign                      | $400                |
+| PR           | Bitcointalk Post w/ Images           | $200                |
+| Botting      | Telegram Reactions                   | $150 per 1000       |
+| Botting      | DEXScreener Fire & Rocket Emojis     | $150 per 400        |
+
+**Total (pre-discount):** ~$2,385  
+**15% Off Package Price:** ~$2,025
+
+#### 💎 Baller Package
+| Category     | Service                             | Price               |
+|--------------|--------------------------------------|---------------------|
+| Listings     | CoinMarketCap Fast Listing          | $6,200              |
+| Listings     | CoinGecko Fast Listing              | $950                |
+| Trendings    | CoinMarketCap Trends Top 4          | $12,000             |
+| Trendings    | Dexscreener Ads – 100k views        | $1,850              |
+| Trendings    | GeckoTerminal Pool Trends           | $300                |
+| DEX Boosts   | DEXTools Turbo – 1000 Nitro         | $850                |
+| PR           | Binance Article                     | $400                |
+| PR           | Shilling (Group/Individual)         | $500–$1,000         |
+| PR           | KOL Management                      | Custom              |
+| Botting      | Twitter Followers                   | $150 per 1000       |
+| Botting      | DEXTools Trust Votes                | $300 per 200        |
+| Botting      | DEXScreener Emojis                  | $150 per 400        |
+| Botting      | Telegram Reactions                  | $150 per 1000       |
+
+**Total (pre-discount):** ~$23,600+  
+**15% Off Package Price:** ~$20,060+
+
+### 4. **Express Interest Form**
+- Form inputs:
+  - Telegram handle (@username)
+  - Optional note field
+- Submit button: **"Express Interest"**
+- On submit:
+  - Show confirmation: _"Thanks! An advisor will contact you on Telegram shortly."_
+  - Trigger backend to notify admin (via email or Telegram DM)
+
+### 5. **Admin Notification**
+- Send notification containing:
+  - Telegram handle
+  - Selected services
+  - Total estimated value
+- Options for notification:
+  - Email (Formspree, EmailJS)
+  - Telegram bot webhook
+  - Google Sheets webhook logging
+
+---
+
+**Styling Guidelines:**
+- Use **TailwindCSS** for fast, clean design.
+- Responsive design: must work on mobile, tablet, and desktop.
+- Minimalist UI with bold category cards and clean typography (Inter or Roboto).
+- Sticky Strategy Board sidebar or footer with running total.
+- Soft hover animations on buttons/cards.
+- Light/Dark mode (optional bonus feature).
+
+---
+
+**Suggested Tech Stack:**
+- **Frontend**: React.js + TailwindCSS
+- **State**: React Hooks or context
+- **Backend (for Express Interest)**: EmailJS or Telegram Bot webhook
+- **Hosting**: Replit or Vercel
+
+---
+
+**Deliverables:**
+- Working Replit-hosted web app
+- Editable `services.json` file
+- Express Interest backend config (form + email or Telegram webhook)
+- README with edit/update instructions
+
+---
+
+Let me know if you want me to generate the first version of this app or scaffold the file structure for your dev.
+

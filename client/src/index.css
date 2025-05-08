@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 5%;
+  --foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --popover: 0 0% 5%;
+  --popover-foreground: 210 40% 98%;
+  --card: 0 0% 10%;
+  --card-foreground: 210 40% 98%;
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --primary: 299 100% 60%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 268 100% 71%; /* Purple accent */
+  --secondary-foreground: 210 40% 98%;
+  --accent: 196 100% 60%; /* Cyan accent */
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 299 100% 60%;
+  --radius: 0.5rem;
+
+  /* Custom colors */
+  --dark-800: 0 0% 10%;
+  --dark-900: 0 0% 5%;
+  
+  /* UI State Colors */
+  --placeholder: 220 13% 50%;
+  --highlight: 299 100% 63%;
+  --selected: 268 80% 70%;
+}
+
+.dark {
+  --background: 0 0% 5%;
+  --foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --popover: 0 0% 5%;
+  --popover-foreground: 210 40% 98%;
+  --card: 0 0% 10%;
+  --card-foreground: 210 40% 98%;
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --primary: 299 100% 60%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 268 100% 71%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 196 100% 60%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 299 100% 60%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-body antialiased bg-background text-gray-200;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+    line-height: 1.2;
+  }
+  
+  p {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Custom utility classes */
+.bg-dark-800 {
+  background-color: #1a1a1a;
+}
+
+.bg-dark-900 {
+  background-color: #0d0d0d;
+}
+
+/* TBD style */
+.tbd {
+  @apply text-slate-500 opacity-70;
+}
+
+/* Section headers */
+.section-header {
+  @apply text-xl md:text-2xl font-heading font-bold mb-4 text-white;
+  text-shadow: 0 0 15px rgba(247, 56, 255, 0.5);
+}
+
+/* Active items */
+.active-item {
+  @apply border-brand border-opacity-50 bg-brand/10;
+}
+
+/* Price styling */
+.price-tag {
+  @apply text-secondary font-medium;
+}
+
+/* Card styles with improved spacing */
+.service-card {
+  @apply p-4 rounded-lg border border-gray-800 transition-all duration-200;
+  margin-bottom: 0.75rem;
+}
+
+.service-card:hover {
+  @apply border-brand/30 bg-brand/5;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(247, 56, 255, 0.15);
+}
+
+/* Sparkle animation */
+@keyframes sparkle-fade {
+  0% { opacity: 0.1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 0.1; }
+}
+
+.sparkle-animation {
+  animation: sparkle-fade 3s ease-in-out infinite;
+}
+
+/* Glow effect for hover */
+.glow-on-hover:hover {
+  box-shadow: 0 0 10px #f738ff, 0 0 20px #f738ff;
+  transition: box-shadow 0.3s ease;
+}
+
+/* Pulse animation for brand elements */
+@keyframes pulse-brand {
+  0% { box-shadow: 0 0 0 0 rgba(247, 56, 255, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(247, 56, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(247, 56, 255, 0); }
+}
+
+.pulse-brand {
+  animation: pulse-brand 2s infinite;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 0 15px rgba(247, 56, 255, 0.3);
+}
+
+/* Multi-line text adjustment */
+.multi-line {
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* Active category tab */
+.category-tab {
+  @apply px-4 py-2 rounded-lg transition-all duration-200;
+}
+
+.category-tab.active {
+  @apply bg-brand/20 text-white;
+  box-shadow: 0 0 10px rgba(247, 56, 255, 0.2);
+}
+
+/* Empty state styling */
+.empty-state {
+  @apply flex flex-col items-center justify-center text-center p-6 rounded-lg border border-dashed border-gray-700 bg-gray-900/50;
+  min-height: 200px;
+}
+
+.empty-state-icon {
+  @apply text-brand/40 mb-3;
+  font-size: 2rem;
+}
+
+.empty-state-text {
+  @apply text-gray-400 mb-4;
+}
+
+/* Tooltip styling */
+.tooltip {
+  @apply relative inline-block cursor-help;
+}
+
+.tooltip:hover .tooltip-text {
+  @apply opacity-100 visible;
+}
+
+.tooltip-text {
+  @apply absolute z-10 p-2 text-xs rounded shadow-lg bg-gray-800 text-white invisible opacity-0 transition-opacity duration-200;
+  width: 180px;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -90px;
+}
+
+/* Improved buttons */
+.btn-primary {
+  @apply bg-brand hover:bg-brand-dark text-white font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  box-shadow: 0 4px 12px rgba(247, 56, 255, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 16px rgba(247, 56, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  @apply bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  box-shadow: 0 4px 12px rgba(180, 93, 255, 0.25);
+}
+
+.btn-accent {
+  @apply bg-accent hover:bg-accent/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  box-shadow: 0 4px 12px rgba(0, 215, 255, 0.25);
+}
+
