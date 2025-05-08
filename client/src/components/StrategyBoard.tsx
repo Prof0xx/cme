@@ -25,6 +25,14 @@ const StrategyBoard = ({ onExpressInterest }: StrategyBoardProps) => {
   } = useStrategyBoard();
 
   const hasItems = selectedItems.length > 0;
+
+  // Scroll to the categories section
+  const scrollToCategories = () => {
+    const categoriesSection = document.getElementById('categories');
+    if (categoriesSection) {
+      categoriesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   const subtotal = getSubtotal();
   const discount = getDiscount();
   const total = getTotal();
@@ -60,6 +68,7 @@ const StrategyBoard = ({ onExpressInterest }: StrategyBoardProps) => {
             <Button 
               variant="outline" 
               className="text-brand border-brand/40 hover:bg-brand/10 hover:shadow-glow"
+              onClick={scrollToCategories}
             >
               Start building your strategy <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -151,3 +160,4 @@ const StrategyBoard = ({ onExpressInterest }: StrategyBoardProps) => {
 };
 
 export default StrategyBoard;
+

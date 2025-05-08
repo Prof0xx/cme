@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useStrategyBoard } from "@/context/StrategyBoardContext";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, ArrowRight } from "lucide-react";
 
 interface MobileStrategyBoardProps {
   onExpressInterest: () => void;
@@ -23,6 +23,15 @@ const MobileStrategyBoard = ({ onExpressInterest }: MobileStrategyBoardProps) =>
   const subtotal = getSubtotal();
   const discount = getDiscount();
   const total = getTotal();
+
+  // Scroll to categories section
+  const scrollToCategories = () => {
+    const categoriesSection = document.getElementById('categories');
+    if (categoriesSection) {
+      categoriesSection.scrollIntoView({ behavior: 'smooth' });
+      setExpanded(false); // Close the mobile board after scrolling
+    }
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 md:hidden bg-dark-900 border-t border-gray-800 shadow-lg">
@@ -70,6 +79,13 @@ const MobileStrategyBoard = ({ onExpressInterest }: MobileStrategyBoardProps) =>
                 </div>
                 <p className="text-gray-500 text-center">Your strategy board is empty</p>
                 <p className="text-gray-600 text-sm text-center mt-1">Select services to add them here</p>
+                <Button 
+                  variant="outline" 
+                  className="text-brand border-brand/40 hover:bg-brand/10 hover:shadow-glow mt-4"
+                  onClick={scrollToCategories}
+                >
+                  Start building your strategy <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
             ) : (
               <div className="space-y-3">
