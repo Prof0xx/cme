@@ -51,5 +51,10 @@
         "cache-control": "public, max-age=0, must-revalidate"
       }
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "NODE_VERSION": "18.x"
+    }
+  }
 }
