@@ -39,6 +39,7 @@ export interface IStorage {
   getReferralTrackingByLeadId(leadId: number): Promise<ReferralTracking | undefined>;
   getReferralTrackingsByReferralCodeId(referralCodeId: number): Promise<ReferralTracking[]>;
   updateReferralTrackingPaymentStatus(id: number, isPaid: boolean): Promise<ReferralTracking | undefined>;
+  createAdmin(username: string, password: string): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -216,14 +217,16 @@ export class DatabaseStorage implements IStorage {
       await db.insert(services).values(serviceData);
     }
   }
+
+  async createAdmin(username: string, password: string): Promise<User> {
+    const [admin] = await db.insert(users).values({
+      username,
+      password,
+      isAdmin: true,
+      createdAt: new Date()
+    }).returning();
+    return admin;
+  }
 }
 
 export const storage = new DatabaseStorage();
-export async function createAdmin(username: string, password: string) {
-  return await db.insert(users).values({
-    username,
-    password,
-    isAdmin: true,
-    createdAt: new Date().toISOString()
-  }).returning();
-}

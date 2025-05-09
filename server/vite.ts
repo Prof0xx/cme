@@ -26,7 +26,7 @@ export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true,
+    allowedHosts: ['localhost', '127.0.0.1']
   };
 
   const vite = await createViteServer({
@@ -73,7 +73,7 @@ export async function setupVite(app: Express, server: Server) {
 export function serveStatic(app: Express) {
   // In Vercel, the client build will be in a different location
   const distPath = process.env.NODE_ENV === 'production'
-    ? path.resolve(process.cwd(), 'client/dist')
+    ? path.resolve(process.cwd(), 'dist')
     : path.resolve(__dirname, "public");
 
   if (!fs.existsSync(distPath)) {
