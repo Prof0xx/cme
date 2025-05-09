@@ -4,6 +4,11 @@ interface TelegramNotificationOptions extends Lead {
   customMessage?: string;
 }
 
+interface Service {
+  name: string;
+  price: string | number;
+}
+
 export async function sendTelegramNotification(options: TelegramNotificationOptions): Promise<boolean> {
   const { customMessage } = options;
 
@@ -46,7 +51,7 @@ function formatDefaultMessage(lead: Lead): string {
   const { telegram, selectedServices, totalValue, message, referralCode } = lead;
   
   const servicesText = Array.isArray(selectedServices) && selectedServices.length > 0
-    ? selectedServices.map((s: { name: string; price: string | number }) => `- ${s.name} (${s.price})`).join('\n')
+    ? selectedServices.map((s: Service) => `- ${s.name} (${s.price})`).join('\n')
     : 'No services selected';
 
   return `🎯 New Lead!\n\nTelegram: ${telegram}\n\nServices:\n${servicesText}\n\nTotal Value: ${totalValue}${message ? `\n\nMessage:\n${message}` : ''}${referralCode ? `\n\nReferral Code: ${referralCode}` : ''}`;
