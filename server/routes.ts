@@ -81,7 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API endpoint to get all service categories
-  app.get('/api/categories', async (_req: Request, res: Response) => {
+  app.get('/api/services', async (_req: Request, res: Response) => {
     try {
       const allServices = await storage.getAllServices();
       

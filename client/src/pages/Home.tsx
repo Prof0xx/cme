@@ -28,11 +28,11 @@ const Home = () => {
 
   // Fetch categories from API
   const { data: categoriesData, isLoading, error } = useQuery<CategoryData>({
-    queryKey: ['/api/categories'],
+    queryKey: ['/api/services'],
     queryFn: async () => {
-      const response = await fetch('/api/categories');
+      const response = await fetch('/api/services');
       if (!response.ok) {
-        throw new Error('Failed to fetch categories');
+        throw new Error('Failed to fetch services');
       }
       return response.json();
     }
