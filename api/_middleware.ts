@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelResponse } from '@vercel/node';
 
 export function setCorsHeaders(res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -13,11 +13,13 @@ export function setCorsHeaders(res: VercelResponse) {
   res.setHeader('X-XSS-Protection', '1; mode=block');
 }
 
-export function handleCors(req: VercelRequest, res: VercelResponse) {
+export function handleCors(req: { method?: string }, res: VercelResponse): boolean {
   setCorsHeaders(res);
+  
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return true;
   }
+  
   return false;
 } 
