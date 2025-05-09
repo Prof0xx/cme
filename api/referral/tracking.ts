@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../../shared/storage';
+import { storage } from '@/shared/storage';
 import { z } from 'zod';
 
 const trackingUpdateSchema = z.object({
