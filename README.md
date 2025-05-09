@@ -1,65 +1,163 @@
+
 # Crypto Marketing Services Explorer (CME)
 
-A dynamic React+Express web application designed for crypto marketing professionals to explore, customize, and package marketing services with seamless Telegram integration.
+## Overview
+CME is a modern web application for crypto project owners and marketing teams to explore, select, and express interest in various marketing services. Built with React, Express, and PostgreSQL, it provides a streamlined experience for discovering and planning marketing strategies.
 
-Crypto Marketing Explorer is an agency for crypto marketing that provides a comprehensive suite of marketing services for blockchain and cryptocurrency projects.
+## Complete User Flow
 
-## Features
+### 1. Service Discovery & Selection
+- User lands on homepage showing 6 main service categories
+- Each category displays:
+  - Icon
+  - Name
+  - Description
+  - Starting price
+- Clicking category reveals detailed service list
+- Services show:
+  - Name
+  - Price
+  - "Add to Board" button
+- Backend routes:
+  - GET `/api/services` - All services
+  - GET `/api/services/:category` - Category-specific services
 
-- **Service Exploration**: Browse services by category with pricing information
-- **Strategy Board**: Build a customized marketing strategy by adding services to your board
-- **Package Selection**: Choose from pre-configured packages for different budgets
-- **Lead Collection**: Submit your selection with Telegram contact information
-- **Custom Service Requests**: Request specific services not listed in the catalog
-- **Telegram Integration**: Real-time notifications when leads are submitted
+### 2. Strategy Board Management
+- Users build marketing plan by adding services
+- Real-time calculations for:
+  - Subtotal
+  - Package discount (15% if package selected)
+  - Final total
+- Context API (StrategyBoardContext) manages:
+  - Selected services state
+  - Package selection
+  - Price calculations
+- Mobile-responsive board shows:
+  - Selected services list
+  - Remove service option
+  - Total cost
+  - Express Interest button
 
-## Tech Stack
+### 3. Package Options
+Two pre-configured service bundles with 15% discount:
 
-- **Frontend**: React, TailwindCSS, Shadcn UI Components
-- **Backend**: Express.js, Node.js
-- **Database**: PostgreSQL with Drizzle ORM
-- **Notifications**: Telegram Bot API
-- **Deployment**: GitHub + Glitch
+#### Budget Package (~$2,025)
+- CoinGecko Listing
+- GeckoTerminal Pool Trends
+- DEXScreener Boost
+- Reddit Campaign
+- Bitcointalk Post
+- Basic engagement boosting
 
-## Getting Started
+#### Baller Package (~$20,060+)
+- Premium listings (CMC + CoinGecko)
+- Top-tier trending placements
+- Comprehensive PR package
+- Advanced visibility boosting
+- Premium engagement services
+
+### 4. Interest Expression Flow
+1. User clicks "Express Interest"
+2. Form collects:
+   - Telegram handle (required, @-prefixed)
+   - Optional message
+   - Optional referral code
+3. Form validation:
+   - Zod schema validation
+   - Telegram handle format check
+   - Referral code verification
+4. Backend processing:
+   - POST `/api/leads` or `/api/leads-with-referral`
+   - Lead stored in PostgreSQL
+   - Services serialized to JSON
+   - Telegram notification sent
+
+### 5. Referral System
+- Input referral code during interest submission
+- System validates code via `/api/referral-code/:code`
+- If valid:
+  - Applies configured discount
+  - Tracks referral for commission
+  - Notifies referrer via Telegram
+- Commission tracking stored in database
+
+### 6. Custom Service Requests
+1. User opens request form
+2. Provides:
+   - Telegram handle
+   - Service description
+   - Optional referral code
+3. Backend:
+   - POST `/api/service-requests`
+   - Stores request
+   - Sends priority notification
+   - Tracks referral if applicable
+
+## Technical Implementation
+
+### Frontend Architecture
+- React + TypeScript
+- TailwindCSS + Shadcn UI
+- TanStack Query for data fetching
+- Context API for state management
+- Mobile-first responsive design
+
+### Backend Architecture
+- Express.js server
+- PostgreSQL with Drizzle ORM
+- RESTful API endpoints
+- Telegram Bot integration
+- Referral system logic
+
+### Database Schema
+```sql
+- Users: Admin accounts
+- Services: Available services
+- Leads: Interest submissions
+- ReferralCodes: Active codes
+- ReferralTracking: Commission tracking
+```
+
+### API Routes
+```typescript
+GET /api/services - List all services
+GET /api/services/:category - Category services
+POST /api/leads - Submit interest
+POST /api/service-requests - Custom requests
+GET /api/referral-code/:code - Validate referral
+POST /api/leads-with-referral - Submit with referral
+```
+
+### Security & Performance
+- Rate limiting on API endpoints
+- Data validation with Zod
+- Secure admin authentication
+- Optimized database queries
+- XSS protection
+
+## Development Setup
 
 ### Prerequisites
-
-- Node.js 18+ 
+- Node.js 18+
 - PostgreSQL database
-- Telegram Bot (for notifications)
+- Telegram Bot token
 
 ### Environment Variables
-
-Create a `.env` file with the following variables:
-
-```
-DATABASE_URL=your_postgresql_connection_string
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-TELEGRAM_CHAT_ID=your_telegram_chat_id
+```env
+DATABASE_URL=your_postgresql_url
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
 ```
 
 ### Installation
+```bash
+npm install
+npm run db:push
+npm run dev
+```
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/Prof0xx/cme.git
-   cd cme
-   ```
+Server runs on port 5000, client on port 3000 in development.
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+## Production Deployment
+The application is configured for deployment on Replit with automatic HTTPS and domain configuration.
 
-3. Run database migrations:
-   ```
-   npm run db:push
-   ```
-
-4. Start the development server:
-   ```
-   npm run dev
-   ```
-
-Visit `http://localhost:5000` to view the application.
