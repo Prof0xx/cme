@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '@/shared/storage';
+import { storage } from '../_lib/storage';
 import { setCorsHeaders } from '../_middleware';
 import { z } from 'zod';
 
@@ -30,6 +30,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           services = await storage.getServicesByCategory(category);
         } else {
           services = await storage.getAllServices();
+        }
+
+        // Add error handling for empty services
+        if (!services || services.length === 0) {
+          return res.status(404).json({ 
+            error: category 
+              ? `No services found in category: ${category}` 
+              : "No services found" 
+          });
         }
 
         // Group services by category for easier frontend rendering
