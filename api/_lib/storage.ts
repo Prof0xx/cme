@@ -4,8 +4,8 @@ import {
   services, type Service, type InsertService,
   referralCodes, type ReferralCode, type InsertReferralCode,
   referralTracking, type ReferralTracking, type InsertReferralTracking
-} from "../../shared/schema";
-import { db } from "../../server/db";
+} from "./schema";
+import { db } from "./db";
 import { eq, and, desc, isNull } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
