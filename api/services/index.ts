@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { storage } from '../_lib/storage';
-import { setCorsHeaders } from '../_middleware';
+import { handleCors } from '../_middleware';
 import { z } from 'zod';
 
 const serviceSchema = z.object({
@@ -13,13 +13,8 @@ const serviceSchema = z.object({
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    // Add CORS headers
-    setCorsHeaders(res);
-
-    // Handle OPTIONS request for CORS
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
+    // Handle CORS
+    if (handleCors(req, res)) return;
 
     switch (req.method) {
       case 'GET': {
