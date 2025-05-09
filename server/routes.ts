@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import "express-session";
-import { storage } from "./storage";
+import { storage } from "../api/_lib/storage";
 import { z } from "zod";
 import { 
   insertLeadSchema, 
@@ -12,11 +12,13 @@ import {
   type InsertService, 
   type InsertReferralCode,
   type InsertReferralTracking,
-  type InsertUser
+  type InsertUser,
+  type Service
 } from "@shared/schema";
 import { services as servicesData } from "../client/src/data/services";
 import { sendTelegramNotification, sendDirectTelegramMessage } from "./telegram";
 import axios from "axios";
+import express from 'express';
 
 // Validate Telegram handle format
 const telegramHandleSchema = z.string().min(2).startsWith('@');
