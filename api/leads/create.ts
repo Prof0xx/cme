@@ -60,8 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await storage.createReferralTracking({
           leadId: lead.id,
           referralCodeId: referralCode.id,
-          isPaid: false,
-          createdAt: new Date()
+          isPaid: false
         });
       }
     }
