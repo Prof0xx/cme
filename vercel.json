@@ -16,6 +16,10 @@
       "dest": "/branding/$1"
     },
     {
+      "src": "^/service-examples/(.*)",
+      "dest": "/service-examples/$1"
+    },
+    {
       "handle": "filesystem"
     },
     {
