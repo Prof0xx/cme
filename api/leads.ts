@@ -43,7 +43,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'POST': {
         try {
           const validatedData = leadSchema.parse(req.body);
-          const lead = await storage.createLead(validatedData);
+          const lead = await storage.createLead({
+            ...validatedData,
+            createdAt: new Date().toISOString()
+          });
           return res.status(201).json(lead);
         } catch (err) {
           if (err instanceof z.ZodError) {
