@@ -1,15 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from './_lib/storage';
-import { handleCors } from './_middleware';
-import { z } from 'zod';
+import { storage } from './lib/storage';
+import { handleCors } from './middleware';
+import { Service } from './lib/schema';
 
-const serviceSchema = z.object({
-  name: z.string().min(1),
-  description: z.string(),
-  category: z.string(),
-  price: z.number().min(0),
-  features: z.array(z.string())
-});
+// Helper function to parse price
+function parsePrice(price: string | null): number | null {
+  if (!price) return null;
+  if (price === 'tbd' || price === 'Custom') return null;
+  if (price.includes('per')) {
+    // For prices like "150 per 1000", take the base price
+    return parseInt(price.split(' ')[0]) || null;
+  }
+  return parseInt(price) || null;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -19,48 +22,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     switch (req.method) {
       case 'GET': {
         try {
-          const category = req.query.category as string | undefined;
-          let services;
+          // Get category from either query param or URL param
+          const category = req.query.category as string || (req.url?.split('/').pop() as string | undefined);
+          let services: Service[];
           
           console.log(`🔍 API /services GET request received${category ? ` for category: ${category}` : ''}`);
           
-          if (category) {
+          if (category && category !== 'services') {
             console.log(`📁 Attempting to fetch services for category: ${category}`);
             services = await storage.getServicesByCategory(category);
             console.log(`✅ getServicesByCategory returned: ${services ? services.length : 0} services`);
+
+            // Return category-specific format
+            if (!services || services.length === 0) {
+              const errorMsg = `No services found in category: ${category}`;
+              console.error(`⚠️ ${errorMsg}`);
+              return res.status(404).json({ error: errorMsg });
+            }
+
+            // Calculate total price
+            const totalPrice = services.reduce((sum, service) => {
+              const price = parsePrice(service.price);
+              return price !== null ? sum + price : sum;
+            }, 0);
+
+            return res.status(200).json({
+              services,
+              totalPrice
+            });
           } else {
             console.log(`📁 Attempting to fetch all services`);
             services = await storage.getAllServices();
             console.log(`✅ getAllServices returned: ${services ? services.length : 0} services`);
-          }
-          
-          console.log("Fetched services:", services);
 
-          // Add error handling for empty services
-          if (!services || services.length === 0) {
-            const errorMsg = category 
-              ? `No services found in category: ${category}` 
-              : "No services found";
-            console.error(`⚠️ ${errorMsg}`);
-            return res.status(404).json({ error: errorMsg });
-          }
-
-          // Group services by category for easier frontend rendering
-          const groupedServices = services.reduce((acc, service) => {
-            if (!acc[service.category]) {
-              acc[service.category] = [];
+            // Add error handling for empty services
+            if (!services || services.length === 0) {
+              console.error(`⚠️ No services found`);
+              return res.status(404).json({ error: "No services found" });
             }
-            acc[service.category].push(service);
-            return acc;
-          }, {} as Record<string, typeof services>);
 
-          console.log(`📦 Services grouped into ${Object.keys(groupedServices).length} categories`);
-          console.log(`🔢 Categories: ${Object.keys(groupedServices).join(', ')}`);
-          
-          return res.status(200).json({
-            categories: Object.keys(groupedServices),
-            services: groupedServices
-          });
+            // Group services by category for easier frontend rendering
+            const groupedServices = services.reduce<Record<string, Service[]>>((acc, service) => {
+              if (!acc[service.category]) {
+                acc[service.category] = [];
+              }
+              acc[service.category].push(service);
+              return acc;
+            }, {});
+
+            console.log(`📦 Services grouped into ${Object.keys(groupedServices).length} categories`);
+            console.log(`🔢 Categories: ${Object.keys(groupedServices).join(', ')}`);
+            
+            return res.status(200).json({
+              categories: Object.keys(groupedServices),
+              services: groupedServices
+            });
+          }
         } catch (err) {
           console.error("🔥 API /services GET failed:", err);
           return res.status(500).json({ error: 'Internal server error' });
@@ -83,7 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
-    console.error('Services Error:', error);
+    console.error('API Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 } 

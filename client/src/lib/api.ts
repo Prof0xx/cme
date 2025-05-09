@@ -9,8 +9,9 @@ export interface Service {
   name: string;
   description: string;
   category: string;
-  price: number;
-  features: string[];
+  price: number | string;
+  example_type?: string;
+  example_content?: string;
 }
 
 export interface Lead {
@@ -35,7 +36,7 @@ export const services = {
   },
   
   getByCategory: async (category: string) => {
-    const { data } = await api.get<Service[]>(`/services?category=${encodeURIComponent(category)}`);
+    const { data } = await api.get<{services: Service[], totalPrice: number}>(`/services/${encodeURIComponent(category)}`);
     return data;
   },
 

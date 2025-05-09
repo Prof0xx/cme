@@ -92,61 +92,22 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
     return `/service-examples/${path}`;
   };
 
-  // Loading state
   if (isLoading) {
-    return (
-      <section className="mb-10">
-        <Button
-          onClick={onBack}
-          variant="outline"
-          className="mr-3 mb-4 bg-background border-gray-800 hover:border-brand hover:text-brand rounded-full p-2" 
-          size="icon"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="animate-pulse mb-4">
-          <div className="h-8 w-1/3 bg-gray-800 rounded-md mb-6"></div>
-        </div>
-
-        <div className="space-y-3">
-          {[1, 2, 3, 4].map((_, index) => (
-            <Card key={index} className="animate-pulse">
-              <CardContent className="flex justify-between items-center py-4">
-                <div className="w-full">
-                  <Skeleton className="h-6 w-1/3 mb-2 bg-gray-700" />
-                  <Skeleton className="h-4 w-1/5 bg-gray-700" />
-                </div>
-                <Skeleton className="h-10 w-28 bg-gray-700" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-    );
+    return <div>Loading services...</div>;
   }
 
-  // Error state
   if (error) {
+    return <div>Error loading services: {(error as Error).message}</div>;
+  }
+
+  if (!servicesData?.services || servicesData.services.length === 0) {
     return (
-      <section className="mb-10">
-        <Button
-          onClick={onBack}
-          variant="outline"
-          className="mr-3 mb-4 bg-background border-gray-800 hover:border-brand hover:text-brand rounded-full p-2" 
-          size="icon"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <SectionHeader 
-          title={`${formattedCategory} Services`} 
-          icon={getCategoryIcon(category)}
-        />
-        <Card variant="outline" className="border-red-800 bg-red-900/30">
-          <CardContent className="py-4 text-red-300">
-            Error loading services. Please try again later.
-          </CardContent>
-        </Card>
-      </section>
+      <div className="p-4">
+        <button onClick={onBack} className="mb-4 text-brand hover:text-brand-dark">
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        <div className="text-center">No services found in this category.</div>
+      </div>
     );
   }
 
@@ -155,7 +116,7 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
       <Button
         onClick={onBack}
         variant="outline"
-        className="mr-3 mb-4 bg-background border-gray-800 hover:border-brand hover:text-brand rounded-full p-2 shadow-sm" 
+        className="mr-3 mb-4 bg-background border-gray-800 hover:border-brand hover:text-brand rounded-full p-2" 
         size="icon"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -166,8 +127,8 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
       />
 
       <div className="space-y-4">
-        {servicesData && servicesData.length > 0 ? (
-          servicesData.map((service: any, index: number) => {
+        {servicesData && servicesData.services.length > 0 ? (
+          servicesData.services.map((service: any, index: number) => {
             const serviceItem: SelectedService = {
               category: service.category,
               name: service.name,
@@ -176,7 +137,7 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
             
             const isSelected = isItemSelected(service.category, service.name);
             const hasDescription = Boolean(service.description);
-            const hasExample = Boolean(service.exampleContent);
+            const hasExample = Boolean(service.example_content);
             const isTBD = isPriceTBD(service.price);
             
             return (
@@ -231,7 +192,7 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
                         <span className="sr-only">View Description</span>
                       </Button>
                     )}
-                    {hasExample && (
+                    {service.example_type && service.example_content && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -241,7 +202,7 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
                           setIsExampleOpen(true);
                         }}
                       >
-                        {service.exampleType === 'image' ? (
+                        {service.example_type === 'image' ? (
                           <>
                             <Image className="h-4 w-4" />
                             <span className="sr-only">View Image Example</span>
@@ -308,9 +269,9 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
             </DialogTitle>
           </DialogHeader>
           <div>
-            {selectedService?.exampleType === 'image' ? (
+            {selectedService?.example_type === 'image' ? (
               <img 
-                src={getImagePath(selectedService?.exampleContent)} 
+                src={getImagePath(selectedService?.example_content)} 
                 alt={`${selectedService?.name} example`} 
                 className="w-full rounded-md border border-gray-800"
               />
@@ -320,7 +281,7 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
                 <Button 
                   variant="default" 
                   className="btn-primary"
-                  onClick={() => window.open(selectedService?.exampleContent, '_blank')}
+                  onClick={() => window.open(selectedService?.example_content, '_blank')}
                 >
                   <ExternalLink className="mr-2 h-4 w-4" />
                   Open Live Example

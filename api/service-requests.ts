@@ -7,7 +7,10 @@ import { storage } from './lib/storage';
 const serviceRequestSchema = z.object({
   telegramHandle: z.string()
     .min(2, { message: "Telegram handle is required" })
-    .startsWith('@', { message: "Telegram handle must start with @" }),
+    .refine(val => val.startsWith('@'), {
+      message: "Telegram handle must start with @",
+      path: ['telegramHandle']
+    }),
   description: z.string().min(1, "Description is required"),
   referralCode: z.string().optional()
 });
@@ -32,12 +35,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    console.log('Received service request body:', req.body);
+    // Parse request body if needed
+    const body = req.body;
+    console.log('Received service request body:', JSON.stringify(body, null, 2));
+    console.log('Request body type:', typeof body);
+    console.log('Request body telegramHandle:', body?.telegramHandle);
+    console.log('Request body telegramHandle type:', typeof body?.telegramHandle);
 
-    const result = serviceRequestSchema.safeParse(req.body);
+    const result = serviceRequestSchema.safeParse(body);
     if (!result.success) {
-      console.error('Service request validation failed:', result.error);
-      return res.status(400).json({ error: 'Invalid request body' });
+      console.error('Service request validation failed:', JSON.stringify(result.error, null, 2));
+      const errorMessage = result.error.errors[0]?.message || 'Invalid request body';
+      return res.status(400).json({ message: errorMessage });
     }
 
     console.log('Validated service request data:', result.data);

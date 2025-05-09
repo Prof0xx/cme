@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from './_lib/storage';
-import { handleCors } from './_middleware';
+import { storage } from './lib/storage';
+import { handleCors } from './middleware';
 import { z } from 'zod';
 
 const referralCodeSchema = z.object({

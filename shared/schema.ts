@@ -16,7 +16,7 @@ export const services = pgTable("services", {
   id: serial("id").primaryKey(),
   category: text("category").notNull(),
   name: text("name").notNull(),
-  price: text("price").notNull(),
+  price: text("price").notNull().default('tbd'),
   description: text("description"),
   exampleType: text("example_type"), // can be 'link' or 'image'
   exampleContent: text("example_content"), // URL for link or image path
@@ -160,5 +160,8 @@ export type ReferralTracking = typeof referralTracking.$inferSelect;
 export type SelectedService = {
   category: string;
   name: string;
-  price: string | number;
+  price: string | number | null;
+  description?: string;
+  example_type?: string;
+  example_content?: string;
 };

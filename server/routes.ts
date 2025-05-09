@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import "express-session";
-import { storage } from "../api/_lib/storage";
+import { storage } from "../api/lib/storage";
 import { z } from "zod";
 import { 
   insertLeadSchema, 
@@ -13,12 +13,17 @@ import {
   type InsertReferralCode,
   type InsertReferralTracking,
   type InsertUser,
-  type Service
+  type Service,
+  services
 } from "@shared/schema";
-import { services as servicesData } from "../client/src/data/services";
-import { sendTelegramNotification, sendDirectTelegramMessage } from "../api/_lib/telegram";
+import { parse } from 'csv-parse/sync';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { sendTelegramNotification, sendDirectTelegramMessage } from "../api/lib/telegram";
 import axios from "axios";
 import express from 'express';
+import { Router } from "express";
+import { db } from "../api/lib/db";
 
 // Validate Telegram handle format
 const telegramHandleSchema = z.string().min(2).startsWith('@');
@@ -39,46 +44,103 @@ const referralCodeSchema = z.object({
 
 // Prepare service data for database seeding
 function prepareServicesToSeed(): InsertService[] {
-  const result: InsertService[] = [];
-  
-  // Process services from the service data
-  Object.entries(servicesData).forEach(([category, services]) => {
-    services.forEach(service => {
-      // Convert price to string if it's a number
-      const price = typeof service.price === 'number' 
-        ? service.price.toString() 
-        : service.price;
-        
-      result.push({
-        category,
-        name: service.name,
-        price,
-      });
+  try {
+    // Read and parse the CSV file
+    const csvPath = join(process.cwd(), 'services - services.csv');
+    const csvContent = readFileSync(csvPath, 'utf-8');
+    console.log('📄 Reading CSV file...');
+    
+    const records = parse(csvContent, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+      relaxColumnCount: true
     });
-  });
-  
-  return result;
+    
+    console.log(`📊 Parsed ${records.length} records from CSV`);
+    console.log('📝 Sample record:', records[0]);
+
+    // Convert CSV records to InsertService format
+    return records.map((record: any) => {
+      // Log raw values for debugging
+      console.log('Raw record values:', {
+        category: record.category,
+        name: record.name,
+        price: record.price,
+        description: record.description,
+        exampleType: record.exampleType,
+        exampleContent: record.exampleContent
+      });
+
+      // Keep the original price value, including 'tbd'
+      const price = record.price?.trim() || null;
+
+      const service = {
+        category: record.category.trim(),
+        name: record.name.trim(),
+        price: price,
+        description: record.description?.trim() || null,
+        exampleType: record.exampleType?.trim() || null,
+        exampleContent: record.exampleContent?.trim()?.replace(/attached_assets\\/g, '/service-examples/') || null
+      };
+
+      console.log('Processed service:', service);
+      return service;
+    });
+  } catch (error) {
+    console.error('Error reading services CSV:', error);
+    throw error;
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Seed the database with services
+  // Seed the database with services if needed
   try {
     await (storage as any).seedServices(prepareServicesToSeed());
-    console.log('Services seeded successfully');
+    console.log('Services seeding check completed');
   } catch (error) {
-    console.error('Error seeding services:', error);
+    console.error('Error checking/seeding services:', error);
   }
+
+  // Temporary endpoint to force reseed services
+  app.post('/api/admin/reseed-services', async (_req: Request, res: Response) => {
+    try {
+      // Delete all services
+      await db.delete(services);
+      console.log('Deleted all services');
+
+      // Seed with fresh data
+      await (storage as any).seedServices(prepareServicesToSeed());
+      console.log('Reseeded services');
+
+      res.json({ message: 'Services reseeded successfully' });
+    } catch (error) {
+      console.error('Error reseeding services:', error);
+      res.status(500).json({ error: 'Failed to reseed services' });
+    }
+  });
 
   // API endpoint to get all services
   app.get('/api/services', async (_req: Request, res: Response) => {
     try {
       const allServices = await storage.getAllServices();
-      return res.status(200).json(allServices);
+      
+      // Group services by category
+      const servicesByCategory: Record<string, Service[]> = {};
+      allServices.forEach((service: Service) => {
+        if (!servicesByCategory[service.category]) {
+          servicesByCategory[service.category] = [];
+        }
+        servicesByCategory[service.category].push(service);
+      });
+      
+      res.json({
+        categories: Object.keys(servicesByCategory),
+        services: servicesByCategory
+      });
     } catch (error) {
       console.error("Error fetching services:", error);
-      return res.status(500).json({
-        message: "Failed to fetch services. Please try again later."
-      });
+      res.status(500).json({ error: "Internal server error" });
     }
   });
   
@@ -132,13 +194,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/services/:category', async (req: Request, res: Response) => {
     try {
       const { category } = req.params;
-      const services = await storage.getServicesByCategory(category);
-      return res.status(200).json(services);
-    } catch (error) {
-      console.error(`Error fetching services for category ${req.params.category}:`, error);
-      return res.status(500).json({
-        message: "Failed to fetch services. Please try again later."
+      const allServices = await storage.getAllServices();
+      
+      const servicesInCategory = allServices.filter((service: Service) => service.category === category);
+      
+      const formattedServices = servicesInCategory
+        .map((service: Service) => {
+          return {
+            ...service,
+            price: parseFloat(service.price.toString())
+          };
+        });
+      
+      // Calculate total price
+      const prices = formattedServices
+        .map(service => service.price)
+        .filter((price: number) => !isNaN(price));
+      
+      const totalPrice = prices.reduce((sum, price) => sum + price, 0);
+      
+      res.json({
+        services: formattedServices,
+        totalPrice
       });
+    } catch (error) {
+      console.error("Error fetching services by category:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
   
@@ -794,4 +875,61 @@ ${message ? `Message:\\n${message}` : ''}
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+export function setupRoutes(router: Router) {
+  router.get("/api/services", async (req, res) => {
+    try {
+      const allServices = await storage.getAllServices();
+      
+      // Group services by category
+      const servicesByCategory: Record<string, Service[]> = {};
+      allServices.forEach((service: Service) => {
+        if (!servicesByCategory[service.category]) {
+          servicesByCategory[service.category] = [];
+        }
+        servicesByCategory[service.category].push(service);
+      });
+      
+      res.json({
+        categories: Object.keys(servicesByCategory),
+        services: servicesByCategory
+      });
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  router.get("/api/services/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const allServices = await storage.getAllServices();
+      
+      const servicesInCategory = allServices.filter((service: Service) => service.category === category);
+      
+      const formattedServices = servicesInCategory
+        .map((service: Service) => {
+          return {
+            ...service,
+            price: parseFloat(service.price.toString())
+          };
+        });
+      
+      // Calculate total price
+      const prices = formattedServices
+        .map(service => service.price)
+        .filter((price: number) => !isNaN(price));
+      
+      const totalPrice = prices.reduce((sum, price) => sum + price, 0);
+      
+      res.json({
+        services: formattedServices,
+        totalPrice
+      });
+    } catch (error) {
+      console.error("Error fetching services by category:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 }

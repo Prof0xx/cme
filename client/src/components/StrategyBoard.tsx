@@ -38,12 +38,14 @@ const StrategyBoard = ({ onExpressInterest }: StrategyBoardProps) => {
   const total = getTotal();
 
   // Check if price is TBD
-  const isPriceTBD = (price: string | number) => {
+  const isPriceTBD = (price: string | number | null) => {
+    if (!price) return false;
     return price === "tbd" || price === "TBD";
   };
 
   // Format price display
-  const formatPrice = (price: string | number) => {
+  const formatPrice = (price: string | number | null) => {
+    if (!price) return "TBD";
     if (isPriceTBD(price)) return "TBD";
     if (price === "Custom") return "Custom";
     return typeof price === "number" ? `$${price.toLocaleString()}` : price;

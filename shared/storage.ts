@@ -1,11 +1,14 @@
+import { z } from "zod";
+import { db } from "../api/lib/db";
 import { 
   users, type User, type InsertUser,
   leads, type Lead, type InsertLead, 
   services, type Service, type InsertService,
   referralCodes, type ReferralCode, type InsertReferralCode,
-  referralTracking, type ReferralTracking, type InsertReferralTracking
+  referralTracking, type ReferralTracking, type InsertReferralTracking,
+  packages,
+  packageServices
 } from "./schema";
-import { db } from "../api/_lib/db";
 import { eq, and, desc, isNull } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
@@ -209,12 +212,24 @@ export class DatabaseStorage implements IStorage {
   
   // Helper method to seed initial service data
   async seedServices(serviceData: InsertService[]): Promise<void> {
-    // Check if services table is empty
-    const existingServices = await db.select().from(services);
-    
-    if (existingServices.length === 0) {
-      // Seed the services table
-      await db.insert(services).values(serviceData);
+    try {
+      console.log('🌱 Starting service seeding...');
+      
+      // Check if services table is empty
+      const existingServices = await db.select().from(services);
+      console.log(`📊 Found ${existingServices.length} existing services`);
+      
+      if (existingServices.length === 0) {
+        // Seed the services table
+        console.log('🔄 Seeding services table...');
+        const result = await db.insert(services).values(serviceData);
+        console.log('✅ Services seeded successfully');
+      } else {
+        console.log('⚠️ Services table not empty, skipping seed');
+      }
+    } catch (error) {
+      console.error('❌ Error seeding services:', error);
+      throw error;
     }
   }
 

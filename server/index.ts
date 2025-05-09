@@ -3,13 +3,15 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import session from "express-session";
-import { db } from "../api/_lib/db";
+import { db } from "../api/lib/db";
 import pg from "pg";
 import connectPgSimple from "connect-pg-simple";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { dirname } from "path";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 declare module "express-session" {
   interface SessionData {
@@ -18,13 +20,17 @@ declare module "express-session" {
   }
 }
 
+console.log('🚀 Starting server...');
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+console.log('📁 Setting up static files...');
 // Serve static files from public directory
 app.use(express.static(path.resolve(__dirname, '..', 'public')));
 
+console.log('🔐 Setting up session middleware...');
 // Set up session middleware
 const PgSession = connectPgSimple(session);
 const sessionOptions: session.SessionOptions = {
@@ -47,6 +53,7 @@ const sessionOptions: session.SessionOptions = {
 
 app.use(session(sessionOptions));
 
+console.log('📝 Setting up request logging...');
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -78,6 +85,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log('🛣️ Setting up routes...');
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -92,8 +100,10 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    console.log('🛠️ Setting up Vite in development mode...');
     await setupVite(app, server);
   } else {
+    console.log('📦 Setting up static serving in production mode...');
     serveStatic(app);
   }
 
@@ -106,6 +116,7 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
+    console.log(`🌐 Server listening on http://localhost:${port}`);
     log(`serving on port ${port}`);
   });
 })();
