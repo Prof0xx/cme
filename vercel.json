@@ -2,37 +2,26 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/index.js",
+      "src": "dist/server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist",
-        "buildCommand": "npm run build"
-      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/dist/index.js"
+      "dest": "/dist/server.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/dist/assets/$1"
+      "src": "^/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
-      "src": "/branding/(.*)",
-      "dest": "/dist/branding/$1"
+      "src": "^/branding/(.*)",
+      "dest": "/branding/$1"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/index.html"
+      "src": ".*",
+      "dest": "/dist/server.js"
     }
   ],
   "env": {

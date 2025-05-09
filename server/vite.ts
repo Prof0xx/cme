@@ -75,22 +75,32 @@ export function serveStatic(app: Express) {
     ? path.resolve(process.cwd(), 'dist')
     : path.resolve(__dirname, "..", "client", "dist");
 
+  console.log('Static files path:', distPath);
+
   if (!fs.existsSync(distPath)) {
     console.warn(`Build directory not found at ${distPath}, this might be expected during build time`);
     return;
   }
 
   // Serve static files
-  app.use(express.static(distPath, {
-    index: false // Don't serve index.html for the root path
-  }));
+  app.use(express.static(distPath));
 
-  // Serve index.html for all routes (SPA fallback)
-  app.get('*', (_req, res) => {
+  // API routes should be handled before the catch-all
+  app.use('/api', (req, res, next) => {
+    console.log('API request:', req.path);
+    next();
+  });
+
+  // Serve index.html for all non-API routes (SPA fallback)
+  app.use('*', (req, res) => {
     const indexPath = path.join(distPath, 'index.html');
+    console.log('Serving index.html for:', req.originalUrl);
+    console.log('Index path:', indexPath);
+    
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
+      console.error('index.html not found at:', indexPath);
       res.status(404).send('Not found');
     }
   });
