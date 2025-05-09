@@ -32,6 +32,10 @@
       "dest": "/api/leads.ts"
     },
     {
+      "src": "/api/service-requests",
+      "dest": "/api/service-requests.ts"
+    },
+    {
       "src": "/api/referral",
       "dest": "/api/referral.ts"
     },
