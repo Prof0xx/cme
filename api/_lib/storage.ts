@@ -116,6 +116,7 @@ export class DatabaseStorage implements IStorage {
   // Service methods
   async getAllServices(): Promise<Service[]> {
     try {
+      // Added direct SQL query to fix 500 error in /api/services
       console.log("🔍 getAllServices: Attempting to fetch all services from database");
       
       // Use raw SQL query instead of db.select().from(services)
@@ -272,9 +273,9 @@ export class DatabaseStorage implements IStorage {
               ${service.category}, 
               ${service.name}, 
               ${service.price}, 
-              ${service.description || null}, 
-              ${service.exampleType || null}, 
-              ${service.exampleContent || null}
+              ${service.description ?? null}, 
+              ${service.exampleType ?? null}, 
+              ${service.exampleContent ?? null}
             )
           `);
         }

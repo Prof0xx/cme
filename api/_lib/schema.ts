@@ -68,6 +68,9 @@ export const insertServiceSchema = createInsertSchema(services).pick({
   category: true,
   name: true,
   price: true,
+  description: true,
+  exampleType: true,
+  exampleContent: true,
 });
 
 export const insertLeadSchema = createInsertSchema(leads).pick({
