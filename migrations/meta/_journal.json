@@ -8,6 +8,13 @@
       "when": 1745558531938,
       "tag": "0000_zippy_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1746775620269,
+      "tag": "0001_thin_dark_beast",
+      "breakpoints": true
     }
   ]
 }

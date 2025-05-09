@@ -4,7 +4,7 @@
   "outputDirectory": "dist",
   "builds": [
     {
-      "src": "api/**/*.ts",
+      "src": "api/*.ts",
       "use": "@vercel/node"
     },
     {
@@ -14,14 +14,24 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1.ts",
-      "headers": {
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
-      }
+      "src": "/api/services",
+      "dest": "/api/services.ts"
+    },
+    {
+      "src": "/api/leads",
+      "dest": "/api/leads.ts"
+    },
+    {
+      "src": "/api/referral/(.*)",
+      "dest": "/api/referral.ts?path=$1"
+    },
+    {
+      "src": "/api/admin/(.*)",
+      "dest": "/api/admin.ts?path=$1"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "dest": "/api/auth/$1.ts"
     },
     {
       "src": "^/assets/(.*)",
