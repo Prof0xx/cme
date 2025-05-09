@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendTelegramNotification } from '../server/telegram';
+import { sendTelegramNotification } from './_lib/telegram';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {

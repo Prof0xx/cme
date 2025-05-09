@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { storage } from '../_lib/storage';
-import { sendTelegramNotification } from '../../server/telegram';
+import { sendTelegramNotification } from '../_lib/telegram';
 import { z } from 'zod';
 
 const serviceSchema = z.object({

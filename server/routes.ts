@@ -16,7 +16,7 @@ import {
   type Service
 } from "@shared/schema";
 import { services as servicesData } from "../client/src/data/services";
-import { sendTelegramNotification, sendDirectTelegramMessage } from "./telegram";
+import { sendTelegramNotification, sendDirectTelegramMessage } from "../api/_lib/telegram";
 import axios from "axios";
 import express from 'express';
 

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { db } from '../server/db';
+import { db } from './_lib/db';
 import { storage } from './_lib/storage';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

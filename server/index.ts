@@ -3,7 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import session from "express-session";
-import { db } from "./db";
+import { db } from "../api/_lib/db";
 import pg from "pg";
 import connectPgSimple from "connect-pg-simple";
 import path from "path";

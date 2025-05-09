@@ -5,7 +5,7 @@ import {
   referralCodes, type ReferralCode, type InsertReferralCode,
   referralTracking, type ReferralTracking, type InsertReferralTracking
 } from "./schema";
-import { db } from "../server/db";
+import { db } from "../api/_lib/db";
 import { eq, and, desc, isNull } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
