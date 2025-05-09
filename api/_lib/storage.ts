@@ -7,6 +7,7 @@ import {
 } from "./schema";
 import { db } from "./db";
 import { eq, and, desc, isNull } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -116,7 +117,10 @@ export class DatabaseStorage implements IStorage {
   async getAllServices(): Promise<Service[]> {
     try {
       console.log("🔍 getAllServices: Attempting to fetch all services from database");
-      const rows = await db.select().from(services);
+      
+      // Use raw SQL query instead of db.select().from(services)
+      const rows = await db.execute(sql`SELECT * FROM services`);
+      
       console.log(`✅ getAllServices success: Retrieved ${rows.length} services`);
       
       if (rows.length > 0) {
@@ -135,7 +139,13 @@ export class DatabaseStorage implements IStorage {
   async getServicesByCategory(category: string): Promise<Service[]> {
     try {
       console.log(`🔍 getServicesByCategory: Attempting to fetch services for category: ${category}`);
-      const rows = await db.select().from(services).where(eq(services.category, category));
+      
+      // Use raw SQL query instead of db.select().from(services).where()
+      const rows = await db.execute(sql`
+        SELECT * FROM services 
+        WHERE category = ${category}
+      `);
+      
       console.log(`✅ getServicesByCategory success: Retrieved ${rows.length} services for category ${category}`);
       
       if (rows.length === 0) {
@@ -151,10 +161,15 @@ export class DatabaseStorage implements IStorage {
   
   async deleteService(id: number): Promise<boolean> {
     try {
-      const result = await db.delete(services).where(eq(services.id, id));
+      console.log(`🔍 deleteService: Attempting to delete service with ID: ${id}`);
+      
+      // Use raw SQL for the delete operation
+      await db.execute(sql`DELETE FROM services WHERE id = ${id}`);
+      
+      console.log(`✅ deleteService: Successfully deleted service with ID: ${id}`);
       return true;
     } catch (error) {
-      console.error(`Error deleting service with ID ${id}:`, error);
+      console.error(`❌ Error deleting service with ID ${id}:`, error);
       return false;
     }
   }
@@ -237,12 +252,40 @@ export class DatabaseStorage implements IStorage {
   
   // Helper method to seed initial service data
   async seedServices(serviceData: InsertService[]): Promise<void> {
-    // Check if services table is empty
-    const existingServices = await db.select().from(services);
-    
-    if (existingServices.length === 0) {
-      // Seed the services table
-      await db.insert(services).values(serviceData);
+    try {
+      console.log(`🔍 seedServices: Checking if services table is empty...`);
+      
+      // Check if services table is empty using raw SQL
+      const existingServicesResult = await db.execute(sql`SELECT COUNT(*) as count FROM services`);
+      const count = Number(existingServicesResult[0]?.count || '0');
+      
+      console.log(`✅ seedServices: Found ${count} existing services`);
+      
+      if (count === 0) {
+        console.log(`🌱 seedServices: Seeding ${serviceData.length} services...`);
+        
+        // Insert services one by one to avoid syntax issues with bulk insert
+        for (const service of serviceData) {
+          await db.execute(sql`
+            INSERT INTO services (category, name, price, description, example_type, example_content)
+            VALUES (
+              ${service.category}, 
+              ${service.name}, 
+              ${service.price}, 
+              ${service.description || null}, 
+              ${service.exampleType || null}, 
+              ${service.exampleContent || null}
+            )
+          `);
+        }
+        
+        console.log(`✅ seedServices: Successfully seeded ${serviceData.length} services`);
+      } else {
+        console.log(`ℹ️ seedServices: Services table already has data, skipping seed`);
+      }
+    } catch (error) {
+      console.error(`❌ Error seeding services:`, error);
+      throw error;
     }
   }
 
