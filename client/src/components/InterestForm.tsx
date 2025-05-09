@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { SelectedService } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { leads, referral } from "@/lib/api";
 
 interface InterestFormProps {
   isOpen: boolean;
@@ -42,9 +43,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue }: InterestFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [referralStatus, setReferralStatus] = useState<'none' | 'validating' | 'valid' | 'invalid'>('none');
-  const [discount, setDiscount] = useState<number>(0);
-  const [referralMessage, setReferralMessage] = useState<string>('');
+  const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
+  const [referralDiscount, setReferralDiscount] = useState<number>(0);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -57,35 +57,26 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
     }
   });
 
+  // Validate referral code
   const validateReferralCode = async (code: string) => {
-    if (!code || code.trim() === '') {
-      setReferralStatus('none');
-      setDiscount(0);
+    if (!code) {
+      setReferralCodeValid(null);
+      setReferralDiscount(0);
       return;
     }
-    
-    setReferralStatus('validating');
-    
+
     try {
-      const response = await apiRequest<ReferralResponse>('GET', `/api/referral-code/${code}`, null);
-      
-      if (response.valid) {
-        setReferralStatus('valid');
-        setDiscount(response.discount);
-        setReferralMessage(response.message);
-      } else {
-        setReferralStatus('invalid');
-        setDiscount(0);
-        setReferralMessage('Invalid referral code');
-      }
+      const referralData = await referral.validateCode(code);
+      const isValid = Boolean(referralData);
+      setReferralCodeValid(isValid);
+      setReferralDiscount(isValid ? referralData.discountPercentage : 0);
     } catch (error) {
       console.error('Error validating referral code:', error);
-      setReferralStatus('invalid');
-      setDiscount(0);
-      setReferralMessage('Error validating referral code');
+      setReferralCodeValid(false);
+      setReferralDiscount(0);
     }
   };
-  
+
   // Check for referral code in URL and validate on load
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -105,47 +96,74 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
     if (code.trim() !== '') {
       validateReferralCode(code);
     } else {
-      setReferralStatus('none');
-      setDiscount(0);
-      setReferralMessage('');
+      setReferralCodeValid(null);
+      setReferralDiscount(0);
     }
   };
 
   // Calculate total with discount
-  const finalTotal = discount > 0 ? totalValue - (totalValue * discount / 100) : totalValue;
+  const finalTotal = referralDiscount > 0 ? totalValue - (totalValue * referralDiscount / 100) : totalValue;
 
+  // Handle form submission
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
-
     try {
-      // Use different endpoint if referral code is present and valid
-      if (data.referralCode && referralStatus === 'valid') {
-        await apiRequest('POST', '/api/leads-with-referral', {
-          telegram: data.telegram,
-          message: data.message || "",
-          selectedServices,
-          totalValue,
-          referralCode: data.referralCode
-        });
-      } else {
-        await apiRequest('POST', '/api/leads', {
-          telegram: data.telegram,
-          message: data.message || "",
-          selectedServices,
-          totalValue
-        });
-      }
+      const discountAmount = referralCodeValid ? (totalValue * referralDiscount / 100) : 0;
 
-      setIsSubmitting(false);
+      // Filter out TBD services from the total value calculation
+      const nonTbdServices = selectedServices.filter(service => {
+        if (typeof service.price === 'string') {
+          const priceLower = service.price.toLowerCase();
+          return !priceLower.includes('tbd') && !priceLower.includes('custom');
+        }
+        return typeof service.price === 'number';
+      });
+
+      // Log the data being sent
+      const leadData = {
+        telegram: data.telegram,
+        message: data.message || undefined,
+        referralCode: data.referralCode,
+        selectedServices,  // Send all services but only calculate total for non-TBD
+        totalValue: nonTbdServices.reduce((sum, service) => {
+          if (typeof service.price === 'number') {
+            return sum + service.price;
+          }
+          if (typeof service.price === 'string') {
+            // Handle price ranges
+            if (service.price.includes('-')) {
+              const [min] = service.price.split('-');
+              return sum + parseInt(min.replace(/\D/g, ''));
+            }
+            // Extract number for non-TBD prices
+            const match = service.price.match(/\d+/);
+            return match ? sum + parseInt(match[0]) : sum;
+          }
+          return sum;
+        }, 0),
+        discountApplied: discountAmount
+      };
+
+      console.log('Sending lead data:', leadData);
+
+      const response = await leads.create(leadData);
+      console.log('API Response:', response);
+
       form.reset();
+      setReferralCodeValid(null);
+      setReferralDiscount(0);
       onSuccess();
     } catch (error) {
       console.error('Error submitting form:', error);
+      if (error instanceof Error) {
+        console.error('Error stack:', error.stack);
+      }
       toast({
-        title: "Submission failed",
-        description: "There was an error submitting your interest. Please try again.",
+        title: "Error",
+        description: "Failed to submit form. Please try again.",
         variant: "destructive"
       });
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -207,20 +225,20 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
                     />
                   </FormControl>
                   
-                  {referralStatus === 'valid' && (
+                  {referralCodeValid === true && (
                     <Alert className="mt-2 bg-green-900/20 text-green-400 border border-green-800">
                       <CheckCircle className="h-4 w-4 mr-2" />
                       <AlertDescription>
-                        Valid code! You get {discount}% discount.
+                        Valid code! You get {referralDiscount}% discount.
                       </AlertDescription>
                     </Alert>
                   )}
                   
-                  {referralStatus === 'invalid' && (
+                  {referralCodeValid === false && (
                     <Alert className="mt-2 bg-red-900/20 text-red-400 border border-red-800">
                       <AlertCircle className="h-4 w-4 mr-2" />
                       <AlertDescription>
-                        {referralMessage}
+                        {referralDiscount === 0 ? "Invalid referral code" : "Error validating referral code"}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -251,15 +269,15 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
               )}
             />
             
-            {discount > 0 && (
+            {referralDiscount > 0 && (
               <div className="mb-6 p-3 bg-dark-800 rounded-lg border border-accent-500/30">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-400">Subtotal:</span>
                   <span className="text-white">${totalValue}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-green-400">Discount ({discount}%):</span>
-                  <span className="text-green-400">-${(totalValue * discount / 100).toFixed(2)}</span>
+                  <span className="text-green-400">Discount ({referralDiscount}%):</span>
+                  <span className="text-green-400">-${(totalValue * referralDiscount / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-base mt-2 pt-2 border-t border-gray-700">
                   <span className="font-medium text-white">Total:</span>

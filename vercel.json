@@ -1,15 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "dist/server.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/dist/server.js"
+      "dest": "/api/$1"
     },
     {
       "src": "^/assets/(.*)",
@@ -20,11 +16,11 @@
       "dest": "/branding/$1"
     },
     {
-      "src": ".*",
-      "dest": "/dist/server.js"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }

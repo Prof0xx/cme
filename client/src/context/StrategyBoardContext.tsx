@@ -88,17 +88,20 @@ export function StrategyBoardProvider({ children }: { children: ReactNode }) {
       if (typeof item.price === 'number') {
         return sum + item.price;
       } else if (typeof item.price === 'string') {
+        const priceLower = item.price.toLowerCase();
+        
+        // Skip any price containing 'tbd' or 'custom'
+        if (priceLower.includes('tbd') || priceLower.includes('custom')) {
+          return sum;
+        }
+        
         // Handle price ranges like "200-400"
         if (item.price.includes('-')) {
           const [min] = item.price.split('-');
           return sum + parseInt(min.replace(/\D/g, ''));
         }
-        // Handle "per X" prices
-        if (item.price.toLowerCase().includes('per')) {
-          const priceValue = item.price.replace(/\D/g, '');
-          return sum + parseInt(priceValue);
-        }
-        // Try to extract number
+        
+        // Try to extract number (only for non-TBD prices)
         const match = item.price.match(/\d+/);
         if (match) {
           return sum + parseInt(match[0]);

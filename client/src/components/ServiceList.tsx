@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { services } from "@/lib/api";
 
 interface ServiceListProps {
   category: string;
@@ -34,15 +35,9 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
   const [isExampleOpen, setIsExampleOpen] = useState(false);
 
   // Fetch services from the API
-  const { data: services, isLoading, error } = useQuery({
-    queryKey: ['/api/services', category],
-    queryFn: async () => {
-      const response = await fetch(`/api/services/${category}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch services');
-      }
-      return response.json();
-    }
+  const { data: servicesData, isLoading, error } = useQuery({
+    queryKey: ['services', category],
+    queryFn: () => services.getByCategory(category)
   });
 
   const formattedCategory = category.split('-').map(word => 
@@ -171,8 +166,8 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
       />
 
       <div className="space-y-4">
-        {services && services.length > 0 ? (
-          services.map((service: any, index: number) => {
+        {servicesData && servicesData.length > 0 ? (
+          servicesData.map((service: any, index: number) => {
             const serviceItem: SelectedService = {
               category: service.category,
               name: service.name,
@@ -276,7 +271,7 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
             );
           })
         ) : (
-          <Card variant="outline">
+          <Card variant="outline" className="border-gray-800">
             <CardContent className="py-4 text-gray-400">
               No services found in this category.
             </CardContent>
