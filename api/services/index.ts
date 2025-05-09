@@ -18,37 +18,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     switch (req.method) {
       case 'GET': {
-        const category = req.query.category as string | undefined;
-        let services;
-        
-        if (category) {
-          services = await storage.getServicesByCategory(category);
-        } else {
-          services = await storage.getAllServices();
-        }
-
-        // Add error handling for empty services
-        if (!services || services.length === 0) {
-          return res.status(404).json({ 
-            error: category 
-              ? `No services found in category: ${category}` 
-              : "No services found" 
-          });
-        }
-
-        // Group services by category for easier frontend rendering
-        const groupedServices = services.reduce((acc, service) => {
-          if (!acc[service.category]) {
-            acc[service.category] = [];
+        try {
+          const category = req.query.category as string | undefined;
+          let services;
+          
+          console.log(`🔍 API /services GET request received${category ? ` for category: ${category}` : ''}`);
+          
+          if (category) {
+            console.log(`📁 Attempting to fetch services for category: ${category}`);
+            services = await storage.getServicesByCategory(category);
+            console.log(`✅ getServicesByCategory returned: ${services ? services.length : 0} services`);
+          } else {
+            console.log(`📁 Attempting to fetch all services`);
+            services = await storage.getAllServices();
+            console.log(`✅ getAllServices returned: ${services ? services.length : 0} services`);
           }
-          acc[service.category].push(service);
-          return acc;
-        }, {} as Record<string, typeof services>);
+          
+          console.log("Fetched services:", services);
 
-        return res.status(200).json({
-          categories: Object.keys(groupedServices),
-          services: groupedServices
-        });
+          // Add error handling for empty services
+          if (!services || services.length === 0) {
+            const errorMsg = category 
+              ? `No services found in category: ${category}` 
+              : "No services found";
+            console.error(`⚠️ ${errorMsg}`);
+            return res.status(404).json({ error: errorMsg });
+          }
+
+          // Group services by category for easier frontend rendering
+          const groupedServices = services.reduce((acc, service) => {
+            if (!acc[service.category]) {
+              acc[service.category] = [];
+            }
+            acc[service.category].push(service);
+            return acc;
+          }, {} as Record<string, typeof services>);
+
+          console.log(`📦 Services grouped into ${Object.keys(groupedServices).length} categories`);
+          console.log(`🔢 Categories: ${Object.keys(groupedServices).join(', ')}`);
+          
+          return res.status(200).json({
+            categories: Object.keys(groupedServices),
+            services: groupedServices
+          });
+        } catch (err) {
+          console.error("🔥 API /services GET failed:", err);
+          return res.status(500).json({ error: 'Internal server error' });
+        }
       }
 
       case 'DELETE': {

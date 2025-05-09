@@ -114,11 +114,39 @@ export class DatabaseStorage implements IStorage {
 
   // Service methods
   async getAllServices(): Promise<Service[]> {
-    return await db.select().from(services);
+    try {
+      console.log("🔍 getAllServices: Attempting to fetch all services from database");
+      const rows = await db.select().from(services);
+      console.log(`✅ getAllServices success: Retrieved ${rows.length} services`);
+      
+      if (rows.length > 0) {
+        console.log(`📊 Sample service data: ${JSON.stringify(rows[0], null, 2)}`);
+      } else {
+        console.warn("⚠️ getAllServices: No service records found in database");
+      }
+      
+      return rows;
+    } catch (err) {
+      console.error("❌ getAllServices DB error:", err);
+      throw err;
+    }
   }
 
   async getServicesByCategory(category: string): Promise<Service[]> {
-    return await db.select().from(services).where(eq(services.category, category));
+    try {
+      console.log(`🔍 getServicesByCategory: Attempting to fetch services for category: ${category}`);
+      const rows = await db.select().from(services).where(eq(services.category, category));
+      console.log(`✅ getServicesByCategory success: Retrieved ${rows.length} services for category ${category}`);
+      
+      if (rows.length === 0) {
+        console.warn(`⚠️ getServicesByCategory: No services found for category: ${category}`);
+      }
+      
+      return rows;
+    } catch (err) {
+      console.error(`❌ getServicesByCategory DB error for category ${category}:`, err);
+      throw err;
+    }
   }
   
   async deleteService(id: number): Promise<boolean> {
