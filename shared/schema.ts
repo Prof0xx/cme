@@ -22,6 +22,26 @@ export const services = pgTable("services", {
   exampleContent: text("example_content"), // URL for link or image path
 });
 
+// Package schema
+export const packages = pgTable('packages', {
+  id: serial('id').primaryKey().notNull(),
+  name: text('name').notNull(),
+  description: text('description'),
+  originalPrice: integer('original_price').notNull(),
+  discountPercent: integer('discount_percent').default(15),
+  className: text('class_name'),
+  buttonClassName: text('button_class_name'),
+  discountBadgeClassName: text('discount_badge_class_name'),
+});
+
+// Package services junction table
+export const packageServices = pgTable('package_services', {
+  id: serial('id').primaryKey().notNull(),
+  packageId: integer('package_id').references(() => packages.id),
+  serviceId: integer('service_id').references(() => services.id),
+  isHidden: boolean('is_hidden').default(false),
+});
+
 // Referral codes schema
 export const referralCodes = pgTable("referral_codes", {
   id: serial("id").primaryKey(),
@@ -68,6 +88,24 @@ export const insertServiceSchema = createInsertSchema(services).pick({
   category: true,
   name: true,
   price: true,
+  description: true,
+  exampleType: true,
+  exampleContent: true,
+});
+
+export const insertPackageSchema = createInsertSchema(packages).pick({
+  name: true,
+  description: true,
+  originalPrice: true,
+  discountPercent: true,
+  className: true,
+  buttonClassName: true,
+  discountBadgeClassName: true,
+});
+
+export const insertPackageServiceSchema = createInsertSchema(packageServices).pick({
+  packageId: true,
+  serviceId: true,
 });
 
 export const insertLeadSchema = createInsertSchema(leads).pick({
@@ -102,6 +140,12 @@ export type User = typeof users.$inferSelect;
 
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type Service = typeof services.$inferSelect;
+
+export type InsertPackage = z.infer<typeof insertPackageSchema>;
+export type Package = typeof packages.$inferSelect;
+
+export type InsertPackageService = z.infer<typeof insertPackageServiceSchema>;
+export type PackageService = typeof packageServices.$inferSelect;
 
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 export type Lead = typeof leads.$inferSelect;
