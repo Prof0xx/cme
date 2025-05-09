@@ -11,7 +11,6 @@
     "build:client": "cross-env NODE_ENV=production vite build",
     "build:server": "tsc --noEmit",
     "build": "npm run build:client && npm run build:server",
-    "vercel-build": "npm run build",
     "start": "cross-env NODE_ENV=production node dist/server.js",
     "check": "tsc",
     "db:push": "drizzle-kit push",
