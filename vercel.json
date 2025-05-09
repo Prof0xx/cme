@@ -4,7 +4,7 @@
   "outputDirectory": "dist",
   "builds": [
     {
-      "src": "api/*.ts",
+      "src": "api/**/*.ts",
       "use": "@vercel/node"
     },
     {
@@ -24,16 +24,16 @@
       "continue": true
     },
     {
+      "src": "/api/service-requests",
+      "dest": "/api/service-requests.ts"
+    },
+    {
       "src": "/api/services",
       "dest": "/api/services.ts"
     },
     {
       "src": "/api/leads",
       "dest": "/api/leads.ts"
-    },
-    {
-      "src": "/api/service-requests",
-      "dest": "/api/service-requests.ts"
     },
     {
       "src": "/api/referral",
