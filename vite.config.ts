@@ -34,9 +34,10 @@ export default defineConfig({
       output: {
         manualChunks: undefined
       }
-    }
+    },
+    sourcemap: true
   },
-  base: "/",
+  base: "./",
   server: {
     proxy: {
       '/api': {
