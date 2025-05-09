@@ -14,24 +14,24 @@
   ],
   "routes": [
     {
-      "src": "/api/services",
+      "src": "/api/services(?:/)?(.*)",
       "dest": "/api/services.ts"
     },
     {
-      "src": "/api/leads",
+      "src": "/api/leads(?:/)?(.*)",
       "dest": "/api/leads.ts"
     },
     {
-      "src": "/api/referral/(.*)",
-      "dest": "/api/referral.ts?path=$1"
+      "src": "/api/referral(?:/)?(.*)",
+      "dest": "/api/referral.ts"
     },
     {
-      "src": "/api/admin/(.*)",
-      "dest": "/api/admin.ts?path=$1"
+      "src": "/api/admin(?:/)?(.*)",
+      "dest": "/api/admin.ts"
     },
     {
-      "src": "/api/auth/(.*)",
-      "dest": "/api/auth/$1.ts"
+      "src": "/api/auth(?:/)?(.*)",
+      "dest": "/api/auth.ts"
     },
     {
       "src": "^/assets/(.*)",
