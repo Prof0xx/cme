@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { setCorsHeaders } from './middleware';
-import { sendTelegramNotification } from './lib/telegram';
-import { storage } from './lib/storage';
+import { setCorsHeaders } from './middleware.js';
+import { sendTelegramNotification } from './lib/telegram.js';
+import { storage } from './lib/storage.js';
 
 const serviceRequestSchema = z.object({
   telegramHandle: z.string()

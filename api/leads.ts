@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from './lib/storage';
-import { handleCors } from './middleware';
+import { storage } from './lib/storage.js';
+import { handleCors } from './middleware.js';
 import { z } from 'zod';
 
 const leadSchema = z.object({

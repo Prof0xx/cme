@@ -4,8 +4,8 @@ import {
   services, type Service, type InsertService,
   referralCodes, type ReferralCode, type InsertReferralCode,
   referralTracking, type ReferralTracking, type InsertReferralTracking
-} from "./schema";
-import { db } from "./db";
+} from "./schema.js";
+import { db } from "./db.js";
 import { eq, and, desc, isNull } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 

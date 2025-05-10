@@ -1,4 +1,4 @@
-import { Lead } from './schema';
+import { Lead } from './schema.js';
 
 interface TelegramNotificationOptions extends Lead {
   customMessage?: string;
