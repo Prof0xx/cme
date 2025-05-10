@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
   "framework": "vite",
   "builds": [
     {
@@ -10,92 +12,75 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm run build",
-        "outputDirectory": "dist"
+        "distDir": "dist"
       }
-    },
-    {
-      "src": "public/**/*",
-      "use": "@vercel/static"
     }
   ],
-  "routes": [
+  "rewrites": [
+    { "source": "/api/services/:category", "destination": "/api/services.ts" },
+    { "source": "/api/services", "destination": "/api/services.ts" },
+    { "source": "/api/leads", "destination": "/api/leads.ts" },
+    { "source": "/api/admin/:path*", "destination": "/api/admin/:path*" },
+    { "source": "/api/referral/:path*", "destination": "/api/referral/:path*" },
+    { "source": "/api/service-requests", "destination": "/api/service-requests.ts" },
+    { "source": "/service-examples/:path*", "destination": "/dist/service-examples/:path*" },
+    { "source": "/assets/:path*", "destination": "/dist/assets/:path*" },
+    { "source": "/(.*)", "destination": "/dist/index.html" }
+  ],
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "headers": {
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
-      },
-      "continue": true
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
+      ]
     },
     {
-      "src": "/api/service-requests",
-      "dest": "/api/service-requests.ts"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     },
     {
-      "src": "/api/services",
-      "dest": "/api/services.ts"
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
-      "src": "/api/leads",
-      "dest": "/api/leads.ts"
+      "source": "/service-examples/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
-      "src": "/api/referral",
-      "dest": "/api/referral.ts"
+      "source": "/(.*)\\.(?:jpg|jpeg|gif|png|svg|ico|webp)$",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
-      "src": "/api/admin",
-      "dest": "/api/admin.ts"
-    },
-    {
-      "src": "/api/auth",
-      "dest": "/api/auth.ts"
-    },
-    {
-      "src": "/api/referral-code/(.*)",
-      "dest": "/api/referral.ts?path=codes&code=$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/public/favicon.ico"
-    },
-    {
-      "src": "/sparkles.png",
-      "dest": "/public/sparkles.png"
-    },
-    {
-      "src": "/logo.png",
-      "dest": "/public/logo.png"
-    },
-    {
-      "src": "/logo-with-sparkles.png",
-      "dest": "/public/logo-with-sparkles.png"
-    },
-    {
-      "src": "/vercel.txt",
-      "dest": "/public/vercel.txt"
-    },
-    {
-      "src": "/branding/(.*)",
-      "dest": "/public/branding/$1"
-    },
-    {
-      "src": "/service-examples/(.*)",
-      "dest": "/public/service-examples/$1"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "^/(?!api/?.*$).*",
-      "dest": "/index.html"
+      "source": "/(.*)\\.(?:js|css)$",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

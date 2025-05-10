@@ -1,4 +1,4 @@
-import { ArrowLeft, Info, Image, ExternalLink, Flame, Rocket, Beaker, Zap, HelpCircle } from "lucide-react";
+import { ArrowLeft, Info, Image, ExternalLink, Flame, Rocket, Beaker, Zap, HelpCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStrategyBoard } from "@/context/StrategyBoardContext";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { SectionHeader } from "@/components/SectionHeader";
 import { TagBadge } from "@/components/TagBadge";
@@ -22,6 +22,64 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { services } from "@/lib/api";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+// Sample fallback data for different categories
+const fallbackServices = {
+  'listings': [
+    {
+      id: 1,
+      category: 'listings',
+      name: 'CoinGecko Listing',
+      price: 2000,
+      description: 'Get your token listed on CoinGecko to increase visibility and legitimacy.',
+      example_type: 'link',
+      example_content: 'https://www.coingecko.com/'
+    },
+    {
+      id: 2,
+      category: 'listings',
+      name: 'CoinMarketCap Listing',
+      price: 2500,
+      description: 'Professional assistance with listing your token on CoinMarketCap.',
+      example_type: 'link',
+      example_content: 'https://coinmarketcap.com/'
+    }
+  ],
+  'trendings': [
+    {
+      id: 3,
+      category: 'trendings',
+      name: 'CoinGecko Trending',
+      price: 5000,
+      description: 'Get your token trending on CoinGecko.',
+      example_type: 'link',
+      example_content: 'https://www.coingecko.com/en/discover'
+    }
+  ],
+  'dex-boosts': [
+    {
+      id: 4,
+      category: 'dex-boosts',
+      name: 'DEX Volume Boost',
+      price: 3000,
+      description: 'Increase your token visibility with DEX volume boost.',
+      example_type: 'link',
+      example_content: 'https://info.uniswap.org/'
+    }
+  ],
+  'botting': [
+    {
+      id: 5,
+      category: 'botting',
+      name: 'Twitter Engagement Bot',
+      price: 1500,
+      description: 'Bot-driven engagement for your Twitter posts.',
+      example_type: 'link',
+      example_content: 'https://twitter.com/'
+    }
+  ]
+};
 
 interface ServiceListProps {
   category: string;
@@ -33,12 +91,48 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
   const [selectedService, setSelectedService] = useState<any>(null);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const [isExampleOpen, setIsExampleOpen] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
 
   // Fetch services from the API
-  const { data: servicesData, isLoading, error } = useQuery({
+  const { data: servicesData, isLoading, error, isError, refetch } = useQuery({
     queryKey: ['services', category],
-    queryFn: () => services.getByCategory(category)
+    queryFn: async () => {
+      console.log(`Fetching services for category: ${category}`);
+      try {
+        const data = await services.getByCategory(category);
+        console.log(`Services fetched successfully:`, data);
+        return data;
+      } catch (err) {
+        console.error(`Error fetching services for ${category}:`, err);
+        throw err;
+      }
+    },
+    retry: 2,
+    retryDelay: 1000
   });
+
+  // After 5 seconds of loading or on error, fall back to sample data
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    
+    if (isLoading) {
+      timeout = setTimeout(() => {
+        if (isLoading) {
+          console.log("Falling back to sample data due to long loading time");
+          setUseFallback(true);
+        }
+      }, 5000);
+    }
+    
+    if (isError) {
+      console.log("Falling back to sample data due to error");
+      setUseFallback(true);
+    }
+    
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [isLoading, isError]);
 
   const formattedCategory = category.split('-').map(word => 
     word.charAt(0).toUpperCase() + word.slice(1)
@@ -92,21 +186,91 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
     return `/service-examples/${path}`;
   };
 
-  if (isLoading) {
-    return <div>Loading services...</div>;
+  // Get services based on API data or fallback
+  const getDisplayServices = () => {
+    if (useFallback && fallbackServices[category as keyof typeof fallbackServices]) {
+      return { 
+        services: fallbackServices[category as keyof typeof fallbackServices],
+        totalPrice: fallbackServices[category as keyof typeof fallbackServices].reduce(
+          (sum, service) => sum + (typeof service.price === 'number' ? service.price : 0), 0
+        )
+      };
+    }
+    
+    return servicesData;
+  };
+
+  // Handle retry
+  const handleRetry = () => {
+    setUseFallback(false);
+    refetch();
+  };
+
+  const displayData = getDisplayServices();
+
+  if (isLoading && !useFallback) {
+    return (
+      <div className="p-4">
+        <button onClick={onBack} className="mb-4 text-brand hover:text-brand-dark">
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        <div className="space-y-4">
+          <div className="text-center mb-4">Loading services...</div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i} className="w-full">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center">
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <div className="flex space-x-2">
+                    <Skeleton className="h-9 w-24" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
   }
 
-  if (error) {
-    return <div>Error loading services: {(error as Error).message}</div>;
+  if (isError && !useFallback) {
+    return (
+      <div className="p-4">
+        <button onClick={onBack} className="mb-4 text-brand hover:text-brand-dark">
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-5 w-5" />
+          <AlertTitle>Error loading services</AlertTitle>
+          <AlertDescription>
+            {error instanceof Error ? error.message : "Failed to load services for this category."}
+          </AlertDescription>
+        </Alert>
+        <Button onClick={handleRetry} variant="default" className="mb-4">
+          Retry
+        </Button>
+        <Button onClick={() => setUseFallback(true)} variant="outline" className="ml-2 mb-4">
+          Use Sample Data
+        </Button>
+      </div>
+    );
   }
 
-  if (!servicesData?.services || servicesData.services.length === 0) {
+  if ((!displayData?.services || displayData.services.length === 0) && !useFallback) {
     return (
       <div className="p-4">
         <button onClick={onBack} className="mb-4 text-brand hover:text-brand-dark">
           <ArrowLeft className="h-6 w-6" />
         </button>
         <div className="text-center">No services found in this category.</div>
+        <div className="mt-4 text-center">
+          <Button onClick={() => setUseFallback(true)} variant="outline">
+            View Sample Services
+          </Button>
+        </div>
       </div>
     );
   }
@@ -126,9 +290,22 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
         icon={getCategoryIcon(category)}
       />
 
+      {useFallback && (
+        <Alert className="mb-4">
+          <AlertCircle className="h-5 w-5" />
+          <AlertTitle>Using sample data</AlertTitle>
+          <AlertDescription>
+            Displaying sample services as we couldn't load the real data.
+            <Button onClick={handleRetry} variant="link" className="underline ml-2 p-0">
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="space-y-4">
-        {servicesData && servicesData.services.length > 0 ? (
-          servicesData.services.map((service: any, index: number) => {
+        {displayData && displayData.services && displayData.services.length > 0 ? (
+          displayData.services.map((service: any, index: number) => {
             const serviceItem: SelectedService = {
               category: service.category,
               name: service.name,
@@ -274,6 +451,10 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
                 src={getImagePath(selectedService?.example_content)} 
                 alt={`${selectedService?.name} example`} 
                 className="w-full rounded-md border border-gray-800"
+                onError={(e) => {
+                  // If image fails to load, set a placeholder or default image
+                  (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Image+Not+Available';
+                }}
               />
             ) : (
               <div className="flex flex-col items-center">
