@@ -1,0 +1,2 @@
+This directory contains service example images and other static assets needed by the application.
+If your images are not displaying properly, please make sure this directory is included in your deployed application. 

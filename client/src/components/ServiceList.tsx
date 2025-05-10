@@ -170,7 +170,12 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
 
   // Function to handle different image path formats
   const getImagePath = (path: string | undefined): string => {
-    if (!path) return '';
+    if (!path) return 'https://placehold.co/600x400?text=No+Image+Available';
+    
+    // Handle URLs that are already absolute
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
     
     // If the path already starts with /service-examples/, use it as is
     if (path.startsWith('/service-examples/')) {
@@ -180,6 +185,16 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
     // If path starts with attached_assets/, replace with /service-examples/
     if (path.startsWith('attached_assets/')) {
       return `/service-examples/${path.replace('attached_assets/', '')}`;
+    }
+    
+    // If path starts with a slash, try it directly
+    if (path.startsWith('/')) {
+      return path;
+    }
+    
+    // Try adding /assets/ prefix if it might be in the assets directory
+    if (path.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
+      return `/assets/${path}`;
     }
     
     // Default: assume the filename is directly in service-examples
@@ -452,7 +467,7 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
                 alt={`${selectedService?.name} example`} 
                 className="w-full rounded-md border border-gray-800"
                 onError={(e) => {
-                  // If image fails to load, set a placeholder or default image
+                  console.error(`Failed to load image: ${selectedService?.example_content}`);
                   (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Image+Not+Available';
                 }}
               />
