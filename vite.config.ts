@@ -59,5 +59,6 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
-  }
+  },
+  publicDir: 'public'
 });

@@ -10,10 +10,7 @@
     },
     {
       "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "use": "@vercel/static-build"
     }
   ],
   "rewrites": [
@@ -26,7 +23,10 @@
     { "source": "/service-examples/:path*", "destination": "/service-examples/:path*" },
     { "source": "/assets/:path*", "destination": "/assets/:path*" },
     { "source": "/branding/:path*", "destination": "/branding/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/:path((?!api|branding|service-examples|assets|favicon\\.ico).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
