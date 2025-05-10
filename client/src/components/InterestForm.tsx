@@ -123,8 +123,12 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
       const leadData = {
         telegram: data.telegram,
         message: data.message || undefined,
-        referralCode: data.referralCode,
-        selectedServices,  // Send all services but only calculate total for non-TBD
+        referralCode: data.referralCode || undefined,
+        selectedServices: selectedServices.map(service => ({
+          category: service.category,
+          name: service.name,
+          price: service.price
+        })),
         totalValue: nonTbdServices.reduce((sum, service) => {
           if (typeof service.price === 'number') {
             return sum + service.price;
@@ -141,7 +145,7 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
           }
           return sum;
         }, 0),
-        discountApplied: discountAmount
+        discountApplied: discountAmount || 0
       };
 
       console.log('Sending lead data:', leadData);

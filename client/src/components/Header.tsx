@@ -1,7 +1,10 @@
 import { Moon, Beaker } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from 'react';
 
 const Header = () => {
+  const [logoError, setLogoError] = useState(false);
+
   return (
     <header className="bg-background border-b border-gray-800 sticky top-0 z-50 shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -9,9 +12,10 @@ const Header = () => {
           <div className="h-10 w-10 relative group">
             <div className="absolute inset-0 bg-brand/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse-brand"></div>
             <img 
-              src="/branding/logo.png" 
+              src={logoError ? "https://via.placeholder.com/120x40/1a1a2e/f0f0f0?text=BoostLabs" : "/branding/logo.png"} 
               alt="Boost Labs" 
               className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              onError={() => setLogoError(true)}
             />
           </div>
           <h1 className="ml-3 text-xl font-heading font-bold text-white flex items-center">

@@ -1,0 +1,2 @@
+This is a test file to verify static content serving in Vercel.
+Include this file in your production build to help debug static asset issues. 
