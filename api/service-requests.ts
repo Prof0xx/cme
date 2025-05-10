@@ -10,10 +10,25 @@ const serviceRequestSchema = z.object({
     .refine(val => val.startsWith('@'), {
       message: "Telegram handle must start with @",
       path: ['telegram']
-    }),
-  requestedService: z.string().min(1, "Description is required"),
+    })
+    .optional(),
+  telegramHandle: z.string()
+    .min(2, { message: "Telegram handle is required" })
+    .refine(val => val.startsWith('@'), {
+      message: "Telegram handle must start with @",
+      path: ['telegramHandle']
+    })
+    .optional(),
+  requestedService: z.string().min(1, "Description is required").optional(),
+  description: z.string().min(1, "Description is required").optional(),
   referralCode: z.string().optional()
-});
+}).refine(
+  data => data.telegram || data.telegramHandle, 
+  { message: "Either telegram or telegramHandle must be provided" }
+).refine(
+  data => data.requestedService || data.description,
+  { message: "Either requestedService or description must be provided" }
+);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -51,12 +66,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('Validated service request data:', result.data);
 
-    const { telegram, requestedService, referralCode } = result.data;
+    // Extract data with fallbacks between field names
+    const telegramHandle = result.data.telegramHandle || result.data.telegram || '';
+    const description = result.data.description || result.data.requestedService || '';
+    const { referralCode } = result.data;
 
     // Create a lead for the service request
     const lead = await storage.createLead({
-      telegram: telegram,
-      message: requestedService,
+      telegram: telegramHandle,
+      message: description,
       referralCode: referralCode && referralCode.trim() !== '' ? referralCode : null,
       selectedServices: [],
       totalValue: 0,
@@ -79,7 +97,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Format custom message for service request
-    const customMessage = `🎯 New Service Request!\n\nTelegram: ${telegram}\n\nDescription:\n${requestedService}${referralCode ? `\n\nReferral Code: ${referralCode}` : ''}`;
+    const customMessage = `🎯 New Service Request!\n\nTelegram: ${telegramHandle}\n\nDescription:\n${description}${referralCode ? `\n\nReferral Code: ${referralCode}` : ''}`;
 
     console.log('Sending telegram notification with message:', customMessage);
 

@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { storage } from './lib/storage.js';
 import { handleCors } from './middleware.js';
 import { z } from 'zod';
+import { sendTelegramNotification } from './lib/telegram.js';
 
 const leadSchema = z.object({
   telegram: z.string(),
@@ -42,14 +43,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       case 'POST': {
         try {
+          console.log('📝 Processing new lead submission:', JSON.stringify(req.body, null, 2));
+          
           const validatedData = leadSchema.parse(req.body);
           const lead = await storage.createLead({
             ...validatedData,
             createdAt: new Date().toISOString()
           });
+          
+          console.log('✅ Lead created successfully:', lead.id);
+          
+          // Send Telegram notification
+          try {
+            console.log('🔔 Attempting to send Telegram notification');
+            const notificationResult = await sendTelegramNotification(lead);
+            console.log('🔔 Telegram notification result:', notificationResult);
+          } catch (telegramError) {
+            console.error('❌ Failed to send Telegram notification:', telegramError);
+            // Continue execution even if notification fails
+          }
+          
           return res.status(201).json(lead);
         } catch (err) {
           if (err instanceof z.ZodError) {
+            console.error('❌ Validation error:', JSON.stringify(err.errors, null, 2));
             return res.status(400).json({ error: 'Invalid lead data', details: err.errors });
           }
           console.error("🔥 API /leads POST failed:", err);
