@@ -13,6 +13,10 @@
         "buildCommand": "npm run build",
         "outputDirectory": "dist"
       }
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -56,49 +60,35 @@
     },
     {
       "src": "/favicon.ico",
-      "dest": "/favicon.ico"
+      "dest": "/public/favicon.ico"
     },
     {
-      "src": "^/assets/(.*)",
-      "dest": "/assets/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/sparkles.png",
+      "dest": "/public/sparkles.png"
     },
     {
-      "src": "^/branding/(.*)",
-      "dest": "/branding/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/logo.png",
+      "dest": "/public/logo.png"
     },
     {
-      "src": "^/sparkles.png",
-      "dest": "/sparkles.png",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/logo-with-sparkles.png",
+      "dest": "/public/logo-with-sparkles.png"
     },
     {
-      "src": "^/logo.png",
-      "dest": "/logo.png",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/vercel.txt",
+      "dest": "/public/vercel.txt"
     },
     {
-      "src": "^/logo-with-sparkles.png",
-      "dest": "/logo-with-sparkles.png",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/branding/(.*)",
+      "dest": "/public/branding/$1"
     },
     {
-      "src": "^/service-examples/(.*)",
-      "dest": "/service-examples/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/service-examples/(.*)",
+      "dest": "/public/service-examples/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
       "handle": "filesystem"
