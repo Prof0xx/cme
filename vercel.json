@@ -65,6 +65,18 @@
       }
     },
     {
+      "src": "^/sparkles.png",
+      "dest": "/sparkles.png"
+    },
+    {
+      "src": "^/logo.png",
+      "dest": "/logo.png"
+    },
+    {
+      "src": "^/logo-with-sparkles.png",
+      "dest": "/logo-with-sparkles.png"
+    },
+    {
       "src": "^/service-examples/(.*)",
       "dest": "/service-examples/$1",
       "headers": {
