@@ -5,9 +5,8 @@ import {
   referralCodes, type ReferralCode, type InsertReferralCode,
   referralTracking, type ReferralTracking, type InsertReferralTracking
 } from "./schema.js";
-import { db } from "./db.js";
-import { eq, and, desc, isNull } from "drizzle-orm";
-import { sql } from "drizzle-orm";
+import { db, client } from "./db.js";
+import { eq, and, desc, isNull, sql } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -143,24 +142,25 @@ export class DatabaseStorage implements IStorage {
 
   async getServicesByCategory(category: string): Promise<Service[]> {
     try {
-      console.log(`🔍 getServicesByCategory: Attempting to fetch services for category: ${category}`);
+      console.log(`🔍 Storage: Attempting to get services for category '${category}'`);
       
-      // Use raw SQL query instead of db.select().from(services).where()
-      const rows = await db.execute(sql`
-        SELECT * FROM services 
-        WHERE category = ${category}
-      `);
-      
-      console.log(`✅ getServicesByCategory success: Retrieved ${rows.length} services for category ${category}`);
-      
-      if (rows.length === 0) {
-        console.warn(`⚠️ getServicesByCategory: No services found for category: ${category}`);
+      // Debug: Check if DB connection is available
+      if (!db) {
+        console.error('❌ Storage: Database connection is not established');
+        return [];
       }
       
+      console.log(`🔍 Storage: Executing query for category '${category}'`);
+      // Use template literal syntax with client
+      const rows = await client`SELECT * FROM services WHERE category = ${category} ORDER BY price DESC`;
+      console.log(`✅ Storage: Query executed, received ${rows.length} services`);
+      
       return rows;
-    } catch (err) {
-      console.error(`❌ getServicesByCategory DB error for category ${category}:`, err);
-      throw err;
+    } catch (error: unknown) {
+      console.error(`❌ Storage: Failed to get services for category '${category}':`, 
+                    error instanceof Error ? error.message : String(error));
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
+      throw error;
     }
   }
   

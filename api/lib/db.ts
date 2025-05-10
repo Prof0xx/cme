@@ -9,7 +9,7 @@ if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is not set');
 }
 
-const client = postgres(connectionString, {
+export const client = postgres(connectionString, {
   ssl: 'require',
   max: 1,
   idle_timeout: 20,

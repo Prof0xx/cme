@@ -30,26 +30,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           
           if (category && category !== 'services') {
             console.log(`📁 Attempting to fetch services for category: ${category}`);
-            services = await storage.getServicesByCategory(category);
-            console.log(`✅ getServicesByCategory returned: ${services ? services.length : 0} services`);
+            try {
+              services = await storage.getServicesByCategory(category);
+              console.log(`✅ getServicesByCategory returned: ${services ? services.length : 0} services`);
 
-            // Return category-specific format
-            if (!services || services.length === 0) {
-              const errorMsg = `No services found in category: ${category}`;
-              console.error(`⚠️ ${errorMsg}`);
-              return res.status(404).json({ error: errorMsg });
+              // Return category-specific format
+              if (!services || services.length === 0) {
+                const errorMsg = `No services found in category: ${category}`;
+                console.error(`⚠️ ${errorMsg}`);
+                return res.status(404).json({ error: errorMsg });
+              }
+
+              // Calculate total price
+              const totalPrice = services.reduce((sum, service) => {
+                const price = parsePrice(service.price);
+                return price !== null ? sum + price : sum;
+              }, 0);
+
+              return res.status(200).json({
+                services,
+                totalPrice
+              });
+            } catch (categoryError: unknown) {
+              console.error(`❌ Error fetching services for category ${category}:`, categoryError);
+              return res.status(500).json({ 
+                error: 'Failed to fetch services for category',
+                details: categoryError instanceof Error ? categoryError.message : String(categoryError)
+              });
             }
-
-            // Calculate total price
-            const totalPrice = services.reduce((sum, service) => {
-              const price = parsePrice(service.price);
-              return price !== null ? sum + price : sum;
-            }, 0);
-
-            return res.status(200).json({
-              services,
-              totalPrice
-            });
           } else {
             console.log(`📁 Attempting to fetch all services`);
             services = await storage.getAllServices();
