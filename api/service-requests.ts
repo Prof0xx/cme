@@ -5,13 +5,13 @@ import { sendTelegramNotification } from './lib/telegram.js';
 import { storage } from './lib/storage.js';
 
 const serviceRequestSchema = z.object({
-  telegramHandle: z.string()
+  telegram: z.string()
     .min(2, { message: "Telegram handle is required" })
     .refine(val => val.startsWith('@'), {
       message: "Telegram handle must start with @",
-      path: ['telegramHandle']
+      path: ['telegram']
     }),
-  description: z.string().min(1, "Description is required"),
+  requestedService: z.string().min(1, "Description is required"),
   referralCode: z.string().optional()
 });
 
@@ -39,8 +39,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const body = req.body;
     console.log('Received service request body:', JSON.stringify(body, null, 2));
     console.log('Request body type:', typeof body);
-    console.log('Request body telegramHandle:', body?.telegramHandle);
-    console.log('Request body telegramHandle type:', typeof body?.telegramHandle);
+    console.log('Request body telegram:', body?.telegram);
+    console.log('Request body requestedService:', body?.requestedService);
 
     const result = serviceRequestSchema.safeParse(body);
     if (!result.success) {
@@ -51,13 +51,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('Validated service request data:', result.data);
 
-    const { telegramHandle, description, referralCode } = result.data;
+    const { telegram, requestedService, referralCode } = result.data;
 
     // Create a lead for the service request
     const lead = await storage.createLead({
-      telegram: telegramHandle,
-      message: description,
-      referralCode: referralCode || null,
+      telegram: telegram,
+      message: requestedService,
+      referralCode: referralCode && referralCode.trim() !== '' ? referralCode : null,
       selectedServices: [],
       totalValue: 0,
       createdAt: new Date().toISOString(),
@@ -67,7 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('Created service request lead:', lead);
 
     // If there's a referral code, create tracking
-    if (referralCode) {
+    if (referralCode && referralCode.trim() !== '') {
       const referralCodeData = await storage.getReferralCodeByCode(referralCode);
       if (referralCodeData) {
         await storage.createReferralTracking({
@@ -79,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Format custom message for service request
-    const customMessage = `🎯 New Service Request!\n\nTelegram: ${telegramHandle}\n\nDescription:\n${description}${referralCode ? `\n\nReferral Code: ${referralCode}` : ''}`;
+    const customMessage = `🎯 New Service Request!\n\nTelegram: ${telegram}\n\nDescription:\n${requestedService}${referralCode ? `\n\nReferral Code: ${referralCode}` : ''}`;
 
     console.log('Sending telegram notification with message:', customMessage);
 

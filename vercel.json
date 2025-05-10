@@ -51,6 +51,14 @@
       "dest": "/api/auth.ts"
     },
     {
+      "src": "/api/referral-code/(.*)",
+      "dest": "/api/referral.ts?path=codes&code=$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
       "src": "^/assets/(.*)",
       "dest": "/assets/$1",
       "headers": {
@@ -66,15 +74,24 @@
     },
     {
       "src": "^/sparkles.png",
-      "dest": "/sparkles.png"
+      "dest": "/sparkles.png",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "src": "^/logo.png",
-      "dest": "/logo.png"
+      "dest": "/logo.png",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "src": "^/logo-with-sparkles.png",
-      "dest": "/logo-with-sparkles.png"
+      "dest": "/logo-with-sparkles.png",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "src": "^/service-examples/(.*)",
@@ -82,6 +99,9 @@
       "headers": {
         "cache-control": "public, max-age=31536000, immutable"
       }
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "^/(?!api/?.*$).*",

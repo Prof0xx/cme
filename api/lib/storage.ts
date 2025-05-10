@@ -92,9 +92,13 @@ export class DatabaseStorage implements IStorage {
     const values = {
       ...insertLead,
       message: insertLead.message ?? null,
-      referralCode: insertLead.referralCode ?? null,
+      // Set referralCode to null explicitly if it's falsy or empty string
+      referralCode: (insertLead.referralCode && insertLead.referralCode.trim() !== '') ? insertLead.referralCode : null,
       discountApplied: insertLead.discountApplied ?? 0,
     };
+    
+    // Log the values being inserted to help with debugging
+    console.log('Creating lead with values:', JSON.stringify(values, null, 2));
     
     const [lead] = await db
       .insert(leads)
