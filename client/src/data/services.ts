@@ -1,4 +1,4 @@
-import { SelectedService } from "@shared/schema";
+import type { SelectedService } from "@shared/schema";
 
 // Service categories with their visual configurations
 export const categoryConfigs = {

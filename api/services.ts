@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { storage } from './lib/storage.js';
 import { handleCors } from './middleware.js';
-import { Service } from './lib/schema.js';
+import type { Service } from './lib/schema.js';
 
 // Helper function to parse price
 function parsePrice(price: string | null): number | null {

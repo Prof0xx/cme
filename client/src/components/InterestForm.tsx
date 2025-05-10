@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { SelectedService } from "@shared/schema";
+import type { SelectedService } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { leads, referral } from "@/lib/api";
 

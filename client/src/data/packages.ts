@@ -1,4 +1,4 @@
-import { SelectedService } from "@shared/schema";
+import type { SelectedService } from "@shared/schema";
 
 // Budget-Friendly Package
 export const budgetPackage: SelectedService[] = [
