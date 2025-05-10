@@ -151,8 +151,10 @@ export class DatabaseStorage implements IStorage {
       }
       
       console.log(`🔍 Storage: Executing query for category '${category}'`);
-      // Use template literal syntax with client
-      const rows = await client`SELECT * FROM services WHERE category = ${category} ORDER BY price DESC`;
+      
+      // Use the same approach as getAllServices - using db.execute with SQL
+      const rows = await db.execute(sql`SELECT * FROM services WHERE category = ${category} ORDER BY price DESC`);
+      
       console.log(`✅ Storage: Query executed, received ${rows.length} services`);
       
       return rows;

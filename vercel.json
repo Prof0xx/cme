@@ -17,15 +17,16 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/services/:category", "destination": "/api/services.ts" },
+    { "source": "/api/services/:path*", "destination": "/api/services.ts" },
     { "source": "/api/services", "destination": "/api/services.ts" },
     { "source": "/api/leads", "destination": "/api/leads.ts" },
-    { "source": "/api/admin/:path*", "destination": "/api/admin/:path*" },
-    { "source": "/api/referral/:path*", "destination": "/api/referral/:path*" },
+    { "source": "/api/admin/:path*", "destination": "/api/admin.ts" },
+    { "source": "/api/referral/:path*", "destination": "/api/referral.ts" },
     { "source": "/api/service-requests", "destination": "/api/service-requests.ts" },
-    { "source": "/service-examples/:path*", "destination": "/dist/service-examples/:path*" },
-    { "source": "/assets/:path*", "destination": "/dist/assets/:path*" },
-    { "source": "/(.*)", "destination": "/dist/index.html" }
+    { "source": "/service-examples/:path*", "destination": "/service-examples/:path*" },
+    { "source": "/assets/:path*", "destination": "/assets/:path*" },
+    { "source": "/branding/:path*", "destination": "/branding/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
@@ -57,6 +58,15 @@
     },
     {
       "source": "/service-examples/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/branding/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

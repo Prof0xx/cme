@@ -22,11 +22,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     switch (req.method) {
       case 'GET': {
         try {
-          // Get category from either query param or URL param
-          const category = req.query.category as string || (req.url?.split('/').pop() as string | undefined);
-          let services: Service[];
+          // Extract the category from the URL path or query parameters
+          let category: string | undefined;
+          
+          // Check if the category is in the URL path
+          const urlParts = req.url?.split('/');
+          if (urlParts && urlParts.length > 2) {
+            // URL format: /api/services/[category]
+            category = urlParts[urlParts.length - 1];
+            // Remove query parameters if present
+            if (category && category.includes('?')) {
+              category = category.split('?')[0];
+            }
+          }
+          
+          // If not found in path, check query parameters
+          if (!category || category === 'services') {
+            category = req.query.category as string | undefined;
+          }
           
           console.log(`🔍 API /services GET request received${category ? ` for category: ${category}` : ''}`);
+          
+          let services: Service[];
           
           if (category && category !== 'services') {
             console.log(`📁 Attempting to fetch services for category: ${category}`);

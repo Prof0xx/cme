@@ -24,25 +24,46 @@ export interface Lead {
 }
 
 export interface ServiceRequest {
-  telegramHandle: string;
-  description: string;
+  telegram: string;
+  requestedService: string;
   referralCode?: string;
 }
 
 export const services = {
   getAll: async () => {
-    const { data } = await api.get<Service[]>('/services');
-    return data;
+    try {
+      console.log('API: Fetching all services');
+      const { data } = await api.get<Service[]>('/services');
+      console.log('API: Successfully fetched all services');
+      return data;
+    } catch (error) {
+      console.error('API: Error fetching all services:', error);
+      throw error;
+    }
   },
   
   getByCategory: async (category: string) => {
-    const { data } = await api.get<{services: Service[], totalPrice: number}>(`/services/${encodeURIComponent(category)}`);
-    return data;
+    try {
+      console.log(`API: Fetching services for category '${category}'`);
+      const { data } = await api.get<{services: Service[], totalPrice: number}>(`/services/${encodeURIComponent(category)}`);
+      console.log(`API: Successfully fetched services for category '${category}':`, data.services?.length || 0, 'services');
+      return data;
+    } catch (error) {
+      console.error(`API: Error fetching services for category '${category}':`, error);
+      throw error;
+    }
   },
 
   createRequest: async (request: ServiceRequest) => {
-    const { data } = await api.post('/service-requests', request);
-    return data;
+    try {
+      console.log('API: Creating service request');
+      const { data } = await api.post('/service-requests', request);
+      console.log('API: Successfully created service request');
+      return data;
+    } catch (error) {
+      console.error('API: Error creating service request:', error);
+      throw error;
+    }
   }
 };
 

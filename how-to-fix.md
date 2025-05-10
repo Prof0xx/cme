@@ -2761,7 +2761,7 @@ But in your frontend, ensure you’re using:
 <img src="/branding/logo.png" />
 NOT:
 
-<img src="branding/logo.png" />
+<img src="/branding/logo.png" />
 Without a leading /, it becomes a relative path, which breaks under subroutes (e.g., /services, /dashboard).
 
 ⚠️ RECOMMENDATIONS
