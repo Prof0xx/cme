@@ -110,14 +110,14 @@ const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModal
       // Include referral code if valid
       if (data.referralCode && referralStatus === 'valid') {
         await apiRequest('POST', '/api/service-requests', {
-          telegramHandle: data.telegram,
-          description: data.requestedService,
+          telegram: data.telegram,
+          requestedService: data.requestedService,
           referralCode: data.referralCode
         });
       } else {
         await apiRequest('POST', '/api/service-requests', {
-          telegramHandle: data.telegram,
-          description: data.requestedService
+          telegram: data.telegram,
+          requestedService: data.requestedService
         });
       }
 
