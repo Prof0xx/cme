@@ -1,7 +1,21 @@
 import type { SelectedService } from "@shared/schema";
 import { budgetPackageServices, ballerPackageServices } from "@shared/constants/packages";
 
+// Export the package services for use in the API
 export { budgetPackageServices, ballerPackageServices };
+
+// Convert package services to selected services format
+export const budgetPackage: SelectedService[] = budgetPackageServices.map(service => ({
+  category: service.category,
+  name: service.name,
+  price: "Custom" // Price will be fetched from API
+}));
+
+export const ballerPackage: SelectedService[] = ballerPackageServices.map(service => ({
+  category: service.category,
+  name: service.name,
+  price: "Custom" // Price will be fetched from API
+}));
 
 export const packageDetails = {
   "budget": {
