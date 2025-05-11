@@ -47,7 +47,7 @@ const MobileStrategyBoard = ({ onExpressInterest }: MobileStrategyBoardProps) =>
             <span className="text-white font-medium mr-3">${total.toLocaleString()}</span>
             <Button
               onClick={() => setExpanded(true)}
-              className="px-4 py-2 bg-accent-500 hover:bg-accent-600 transition text-white rounded-lg font-medium text-sm"
+              className="px-4 py-2 bg-primary hover:bg-primary-dark transition text-white rounded-lg font-medium text-sm"
             >
               View Board
             </Button>
@@ -130,15 +130,15 @@ const MobileStrategyBoard = ({ onExpressInterest }: MobileStrategyBoardProps) =>
             <Button
               onClick={onExpressInterest}
               disabled={!hasItems}
-              className="w-full py-6 bg-accent-500 hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed transition text-white rounded-lg font-medium"
+              className="w-full py-6 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition text-white rounded-lg font-medium"
             >
               Express Interest
             </Button>
             <Button
-              onClick={clearBoard}
+              onClick={() => clearBoard()}
               disabled={!hasItems}
               variant="outline"
-              className="w-full py-6 bg-transparent border border-gray-700 text-gray-400 hover:text-white hover:border-gray-600 transition rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-6 bg-transparent border border-gray-700 text-gray-400 hover:text-white hover:border-primary/30 transition rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Clear Board
             </Button>

@@ -97,7 +97,7 @@ const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModal
                   <FormControl>
                     <Input
                       placeholder="@yourusername"
-                      className="w-full bg-dark-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                      className="w-full bg-dark-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
                       {...field}
                     />
                   </FormControl>
@@ -118,7 +118,7 @@ const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModal
                   <FormControl>
                     <Textarea
                       placeholder="What specific marketing service are you looking for?"
-                      className="w-full bg-dark-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                      className="w-full bg-dark-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
                       rows={3}
                       {...field}
                     />
@@ -137,7 +137,7 @@ const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModal
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      className="h-4 w-4 rounded bg-dark-800 border-gray-700 text-primary-600 focus:ring-primary-500 focus:ring-offset-dark-900"
+                      className="h-4 w-4 rounded bg-dark-800 border-gray-700 text-primary focus:ring-primary focus:ring-offset-dark-900"
                     />
                   </FormControl>
                   <FormLabel className="ml-2 text-sm text-gray-300 cursor-pointer">
@@ -160,7 +160,7 @@ const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModal
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-accent-500 hover:bg-accent-600 transition text-white rounded-lg font-medium"
+                className="px-6 py-2 bg-primary hover:bg-primary-dark transition text-white rounded-lg font-medium"
               >
                 {isSubmitting ? "Submitting..." : "Submit Request"}
               </Button>

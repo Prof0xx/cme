@@ -128,8 +128,8 @@ const StrategyBoard = ({ onExpressInterest }: StrategyBoardProps) => {
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-accent">Package Discount</span>
-                <span className="text-accent">-${discount.toLocaleString()}</span>
+                <span className="text-primary">Package Discount</span>
+                <span className="text-primary">-${discount.toLocaleString()}</span>
               </div>
             )}
             <div className="flex justify-between text-base font-medium pt-2">
