@@ -1,4 +1,4 @@
-import { ArrowLeft, Info, Image, ExternalLink, Flame, Rocket, Beaker, Zap, HelpCircle, AlertCircle } from "lucide-react";
+﻿import { ArrowLeft, Info, Image, ExternalLink, Flame, Rocket, Beaker, Zap, HelpCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStrategyBoard } from "@/context/StrategyBoardContext";
 import { useQuery } from "@tanstack/react-query";
@@ -177,28 +177,31 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
       return path;
     }
     
+    // Normalize backslashes to forward slashes
+    const normalizedPath = path.replace(/\\/g, '/');
+    
     // If the path already starts with /service-examples/, use it as is
-    if (path.startsWith('/service-examples/')) {
-      return path;
+    if (normalizedPath.startsWith('/service-examples/')) {
+      return normalizedPath;
     }
     
     // If path starts with attached_assets/, replace with /service-examples/
-    if (path.startsWith('attached_assets/')) {
-      return `/service-examples/${path.replace('attached_assets/', '')}`;
+    if (normalizedPath.startsWith('attached_assets/')) {
+      return `/service-examples/${normalizedPath.replace('attached_assets/', '')}`;
     }
     
     // If path starts with a slash, try it directly
-    if (path.startsWith('/')) {
-      return path;
+    if (normalizedPath.startsWith('/')) {
+      return normalizedPath;
     }
     
     // Try adding /assets/ prefix if it might be in the assets directory
-    if (path.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
-      return `/assets/${path}`;
+    if (normalizedPath.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
+      return `/assets/${normalizedPath}`;
     }
     
     // Default: assume the filename is directly in service-examples
-    return `/service-examples/${path}`;
+    return `/service-examples/${normalizedPath}`;
   };
 
   // Get services based on API data or fallback
@@ -492,3 +495,4 @@ const ServiceList = ({ category, onBack }: ServiceListProps) => {
 };
 
 export default ServiceList;
+
