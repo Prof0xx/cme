@@ -19,7 +19,7 @@ export interface Lead {
   message?: string;
   selectedServices: any[];
   totalValue: number;
-  referralCode?: string;
+  referralCode?: string | null;
   discountApplied?: number;
 }
 
