@@ -156,17 +156,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       const categories = Array.from(categoriesSet);
       
-      // Hard-coded minimum prices as requested
-      const categoryMinPrices: Record<string, number | null> = {
-        "listings": 650,
-        "trendings": 200,
-        "pr": 200,
-        "dex-boosts": 185,
-        "botting": 150,
-        "startup": 100
-      };
+      // Get the minimum price for each category
+      const categoryMinPrices: Record<string, number> = {};
       
-      console.log('Hardcoded category min prices:', categoryMinPrices); // Debug log
+      categories.forEach(category => {
+        const servicesInCategory = allServices.filter(service => service.category === category);
+        const prices = servicesInCategory
+          .map(service => {
+            const price = service.price;
+            if (typeof price === 'string') {
+              // Handle ranges like "200-400" or just numbers as strings
+              if (price.includes('-')) {
+                return parseInt(price.split('-')[0], 10);
+              }
+              return parseInt(price, 10);
+            }
+            return price;
+          })
+          .filter(price => !isNaN(price));
+          
+        categoryMinPrices[category] = Math.min(...prices);
+      });
       
       return res.status(200).json({
         categories,
@@ -859,98 +869,6 @@ ${message ? `Message:\\n${message}` : ''}
       console.error(`Error fetching leads for referral code ${req.params.code}:`, error);
       return res.status(500).json({
         message: "Failed to fetch leads. Please try again later."
-      });
-    }
-  });
-
-  // API endpoint to get package prices
-  app.get('/api/package-prices', async (_req: Request, res: Response) => {
-    try {
-      const allServices = await storage.getAllServices();
-      console.log('All services:', allServices); // Debug log
-      
-      // Helper function to calculate package price
-      const calculatePackagePrice = (packageServices: {category: string, name: string}[]) => {
-        let total = 0;
-        let hasAllPrices = true;
-        
-        packageServices.forEach(packageService => {
-          const service = allServices.find(s => 
-            s.category === packageService.category && 
-            s.name === packageService.name
-          );
-          
-          if (service) {
-            console.log('Found service:', service); // Debug log
-            const price = service.price;
-            
-            // Handle different price formats
-            if (price === null || price === 'Custom' || typeof price === 'undefined') {
-              hasAllPrices = false;
-              return;
-            }
-            
-            if (typeof price === 'number') {
-              total += price;
-              return;
-            }
-            
-            // Handle "X per Y" format
-            if (typeof price === 'string' && price.includes('per')) {
-              const basePrice = parseInt(price.split(' ')[0]);
-              if (!isNaN(basePrice) && basePrice > 0) {
-                total += basePrice;
-                return;
-              }
-              hasAllPrices = false;
-              return;
-            }
-            
-            // Try to parse as number
-            const numericPrice = parseFloat(price.toString());
-            if (!isNaN(numericPrice) && numericPrice > 0) {
-              total += numericPrice;
-            } else {
-              hasAllPrices = false;
-            }
-          } else {
-            console.log('Service not found:', packageService); // Debug log
-            hasAllPrices = false;
-          }
-        });
-        
-        return hasAllPrices ? total : null;
-      };
-
-      // Import package service definitions from shared constants
-      const { budgetPackageServices, ballerPackageServices } = require('../../shared/constants/packages');
-      
-      // Calculate prices
-      const budgetTotal = calculatePackagePrice(budgetPackageServices);
-      const ballerTotal = calculatePackagePrice(ballerPackageServices);
-      
-      console.log('Package totals:', { budgetTotal, ballerTotal }); // Debug log
-      
-      return res.status(200).json({
-        budget: budgetTotal === null ? {
-          originalPrice: null,
-          discountedPrice: null
-        } : {
-          originalPrice: budgetTotal,
-          discountedPrice: Math.floor(budgetTotal * 0.85) // 15% discount
-        },
-        baller: ballerTotal === null ? {
-          originalPrice: null,
-          discountedPrice: null
-        } : {
-          originalPrice: ballerTotal,
-          discountedPrice: Math.floor(ballerTotal * 0.85) // 15% discount
-        }
-      });
-    } catch (error) {
-      console.error("Error calculating package prices:", error);
-      return res.status(500).json({
-        message: "Failed to calculate package prices. Please try again later."
       });
     }
   });

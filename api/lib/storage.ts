@@ -103,17 +103,33 @@ export class DatabaseStorage implements IStorage {
       .insert(leads)
       .values(values)
       .returning();
-    return lead;
+    
+    // Ensure the returned lead has selectedServices as string | any[]
+    return {
+      ...lead,
+      selectedServices: lead.selectedServices as string | any[]
+    };
   }
 
   async getAllLeads(): Promise<Lead[]> {
-    return await db.select().from(leads).orderBy(desc(leads.createdAt));
+    const leadResults = await db.select().from(leads).orderBy(desc(leads.createdAt));
+    // Ensure each lead has selectedServices as string | any[]
+    return leadResults.map(lead => ({
+      ...lead,
+      selectedServices: lead.selectedServices as string | any[]
+    }));
   }
 
   async getLeadsByReferralCode(referralCode: string): Promise<Lead[]> {
-    return await db.select().from(leads)
+    const leadResults = await db.select().from(leads)
       .where(eq(leads.referralCode, referralCode))
       .orderBy(desc(leads.createdAt));
+    
+    // Ensure each lead has selectedServices as string | any[]
+    return leadResults.map(lead => ({
+      ...lead,
+      selectedServices: lead.selectedServices as string | any[]
+    }));
   }
 
   // Service methods

@@ -16,7 +16,8 @@
   "db:push": "drizzle-kit push",
   "db:seed": "tsx scripts/seed-services.ts",
   "update-deps": "npx update-browserslist-db@latest",
-  "preview": "vite preview"
+  "preview": "vite preview",
+  "add-referral-codes": "tsx scripts/add-referral-codes.ts"
 },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface CategoryData {
   categories: string[];
   categoryMinPrices: Record<string, number>;
+  services: Record<string, any[]>;
 }
 
 const Home = () => {
@@ -156,14 +157,25 @@ const Home = () => {
                 ) : categoriesData && categoriesData.categories && categoriesData.categories.length > 0 ? (
                   // Data loaded successfully
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {categoriesData.categories.map((category: string) => (
-                      <ServiceCategory 
-                        key={category} 
-                        category={category}
-                        minPrice={(categoriesData.categoryMinPrices && categoriesData.categoryMinPrices[category]) || 0}
-                        onSelect={handleCategorySelect} 
-                      />
-                    ))}
+                    {categoriesData.categories.map((category: string) => {
+                      // Calculate minimum price for the category
+                      const servicesInCategory = categoriesData.services[category] || [];
+                      const minPrice = servicesInCategory.reduce((min: number, service: any) => {
+                        const price = typeof service.price === 'number' ? service.price : 
+                          typeof service.price === 'string' && !isNaN(parseInt(service.price)) ? 
+                          parseInt(service.price) : Number.MAX_VALUE;
+                        return price < min ? price : min;
+                      }, Number.MAX_VALUE);
+
+                      return (
+                        <ServiceCategory 
+                          key={category} 
+                          category={category}
+                          minPrice={minPrice === Number.MAX_VALUE ? 0 : minPrice}
+                          onSelect={handleCategorySelect} 
+                        />
+                      );
+                    })}
                   </div>
                 ) : (
                   // No categories found

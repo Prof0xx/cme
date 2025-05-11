@@ -115,7 +115,7 @@ export type Lead = {
   message: string | null;
   createdAt: string;
   referralCode: string | null;
-  discountApplied: number;
+  discountApplied: number | null;
 };
 
 export type InsertReferralCode = z.infer<typeof insertReferralCodeSchema>;

@@ -66,10 +66,18 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
     }
 
     try {
+      console.log('Validating referral code:', code);
       const referralData = await referral.validateCode(code);
-      const isValid = Boolean(referralData);
+      console.log('Referral validation response:', referralData);
+      
+      const isValid = Boolean(referralData?.valid);
       setReferralCodeValid(isValid);
-      setReferralDiscount(isValid ? referralData.discountPercentage : 0);
+      setReferralDiscount(isValid ? referralData.discount : 0);
+      
+      console.log('Updated referral state:', {
+        isValid,
+        discount: isValid ? referralData.discount : 0
+      });
     } catch (error) {
       console.error('Error validating referral code:', error);
       setReferralCodeValid(false);
@@ -77,29 +85,32 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
     }
   };
 
-  // Check for referral code in URL and validate on load
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
-    
-    if (refCode) {
-      form.setValue('referralCode', refCode);
-      validateReferralCode(refCode);
-    }
-  }, [form]);
-
   // Handle referral code change
   const handleReferralCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const code = e.target.value;
+    const code = e.target.value.trim().toUpperCase();
+    console.log('Referral code changed:', code);
+    
     form.setValue('referralCode', code);
     
-    if (code.trim() !== '') {
+    if (code !== '') {
       validateReferralCode(code);
     } else {
       setReferralCodeValid(null);
       setReferralDiscount(0);
     }
   };
+
+  // Check for referral code in URL and validate on load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref')?.trim().toUpperCase();
+    
+    if (refCode) {
+      console.log('Found referral code in URL:', refCode);
+      form.setValue('referralCode', refCode);
+      validateReferralCode(refCode);
+    }
+  }, [form]);
 
   // Calculate total with discount
   const finalTotal = referralDiscount > 0 ? totalValue - (totalValue * referralDiscount / 100) : totalValue;
@@ -108,8 +119,13 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      const discountAmount = referralCodeValid ? (totalValue * referralDiscount / 100) : 0;
-
+      // Verify referral code state
+      console.log('Form submission - referral state:', {
+        codeFromForm: data.referralCode,
+        isValid: referralCodeValid,
+        discount: referralDiscount
+      });
+      
       // Filter out TBD services from the total value calculation
       const nonTbdServices = selectedServices.filter(service => {
         if (typeof service.price === 'string') {
@@ -119,36 +135,50 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
         return typeof service.price === 'number';
       });
 
+      // Calculate total and discount
+      const subtotal = nonTbdServices.reduce((sum, service) => {
+        if (typeof service.price === 'number') {
+          return sum + service.price;
+        }
+        if (typeof service.price === 'string') {
+          // Handle price ranges
+          if (service.price.includes('-')) {
+            const [min] = service.price.split('-');
+            return sum + parseInt(min.replace(/\D/g, ''));
+          }
+          // Extract number for non-TBD prices
+          const match = service.price.match(/\d+/);
+          return match ? sum + parseInt(match[0]) : sum;
+        }
+        return sum;
+      }, 0);
+
+      // Only apply discount if referral code is valid
+      const discountAmount = referralCodeValid === true ? Math.round(subtotal * referralDiscount / 100) : 0;
+
+      // Ensure referral code is properly set
+      const validReferralCode = referralCodeValid === true ? data.referralCode : undefined;
+      
       // Log the data being sent
       const leadData = {
         telegram: data.telegram,
         message: data.message || undefined,
-        referralCode: data.referralCode || undefined,
+        referralCode: validReferralCode,
         selectedServices: selectedServices.map(service => ({
           category: service.category,
           name: service.name,
           price: service.price
         })),
-        totalValue: nonTbdServices.reduce((sum, service) => {
-          if (typeof service.price === 'number') {
-            return sum + service.price;
-          }
-          if (typeof service.price === 'string') {
-            // Handle price ranges
-            if (service.price.includes('-')) {
-              const [min] = service.price.split('-');
-              return sum + parseInt(min.replace(/\D/g, ''));
-            }
-            // Extract number for non-TBD prices
-            const match = service.price.match(/\d+/);
-            return match ? sum + parseInt(match[0]) : sum;
-          }
-          return sum;
-        }, 0),
-        discountApplied: discountAmount || 0
+        totalValue: subtotal,
+        discountApplied: discountAmount
       };
 
-      console.log('Sending lead data:', leadData);
+      console.log('Sending lead data:', {
+        ...leadData,
+        referralCodeValid,
+        referralDiscount,
+        originalReferralCode: data.referralCode
+      });
 
       const response = await leads.create(leadData);
       console.log('API Response:', response);
@@ -157,6 +187,11 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
       setReferralCodeValid(null);
       setReferralDiscount(0);
       onSuccess();
+      
+      toast({
+        title: "Success",
+        description: "Your interest has been submitted successfully!",
+      });
     } catch (error) {
       console.error('Error submitting form:', error);
       if (error instanceof Error) {

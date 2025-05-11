@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
-import { X, CheckCircle, AlertCircle } from "lucide-react";
+import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,18 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface RequestServiceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-}
-
-interface ReferralResponse {
-  valid: boolean;
-  discount: number;
-  message: string;
 }
 
 const formSchema = z.object({
@@ -30,7 +23,6 @@ const formSchema = z.object({
     .startsWith('@', { message: "Telegram handle must start with @" }),
   requestedService: z.string()
     .min(3, { message: "Please describe the service you're looking for" }),
-  referralCode: z.string().optional(),
   privacyConsent: z.boolean().refine(val => val === true, {
     message: "You must agree to be contacted"
   })
@@ -40,8 +32,6 @@ type FormValues = z.infer<typeof formSchema>;
 
 const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [referralStatus, setReferralStatus] = useState<'none' | 'validating' | 'valid' | 'invalid'>('none');
-  const [referralMessage, setReferralMessage] = useState<string>('');
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -49,77 +39,18 @@ const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModal
     defaultValues: {
       telegram: '',
       requestedService: '',
-      referralCode: '',
       privacyConsent: false
     }
   });
-
-  const validateReferralCode = async (code: string) => {
-    if (!code || code.trim() === '') {
-      setReferralStatus('none');
-      return;
-    }
-    
-    setReferralStatus('validating');
-    
-    try {
-      const response = await apiRequest<ReferralResponse>('GET', `/api/referral-code/${code}`, null);
-      
-      if (response.valid) {
-        setReferralStatus('valid');
-        setReferralMessage(`Valid code! You'll get priority service.`);
-      } else {
-        setReferralStatus('invalid');
-        setReferralMessage('Invalid referral code');
-      }
-    } catch (error) {
-      console.error('Error validating referral code:', error);
-      setReferralStatus('invalid');
-      setReferralMessage('Error validating referral code');
-    }
-  };
-  
-  // Check for referral code in URL and validate on load
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
-    
-    if (refCode) {
-      form.setValue('referralCode', refCode);
-      validateReferralCode(refCode);
-    }
-  }, [form]);
-
-  // Handle referral code change
-  const handleReferralCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const code = e.target.value;
-    form.setValue('referralCode', code);
-    
-    if (code.trim() !== '') {
-      validateReferralCode(code);
-    } else {
-      setReferralStatus('none');
-      setReferralMessage('');
-    }
-  };
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
 
     try {
-      // Include referral code if valid
-      if (data.referralCode && referralStatus === 'valid') {
-        await apiRequest('POST', '/api/service-requests', {
-          telegram: data.telegram,
-          requestedService: data.requestedService,
-          referralCode: data.referralCode
-        });
-      } else {
-        await apiRequest('POST', '/api/service-requests', {
-          telegram: data.telegram,
-          requestedService: data.requestedService
-        });
-      }
+      await apiRequest('POST', '/api/service-requests', {
+        telegram: data.telegram,
+        requestedService: data.requestedService
+      });
 
       setIsSubmitting(false);
       form.reset();
@@ -192,49 +123,6 @@ const RequestServiceModal = ({ isOpen, onClose, onSuccess }: RequestServiceModal
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="referralCode"
-              render={({ field }) => (
-                <FormItem className="mb-6">
-                  <FormLabel className="text-gray-300">
-                    Referral Code <span className="text-gray-500">(optional)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter referral code"
-                      className="w-full bg-dark-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleReferralCodeChange(e);
-                      }}
-                    />
-                  </FormControl>
-                  
-                  {referralStatus === 'valid' && (
-                    <Alert className="mt-2 bg-green-900/20 text-green-400 border border-green-800">
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      <AlertDescription>
-                        {referralMessage}
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                  
-                  {referralStatus === 'invalid' && (
-                    <Alert className="mt-2 bg-red-900/20 text-red-400 border border-red-800">
-                      <AlertCircle className="h-4 w-4 mr-2" />
-                      <AlertDescription>
-                        {referralMessage}
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                  
                   <FormMessage />
                 </FormItem>
               )}

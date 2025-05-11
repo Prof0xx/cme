@@ -69,15 +69,32 @@ export const services = {
 
 export const leads = {
   create: async (lead: Lead) => {
-    const { data } = await api.post('/leads', lead);
-    return data;
+    try {
+      console.log('API: Creating lead with data:', lead);
+      
+      // Make sure the referral code is explicitly set if valid
+      const payload = {
+        ...lead,
+        referralCode: lead.referralCode || null,
+        discountApplied: lead.discountApplied || 0
+      };
+      
+      console.log('API: Sending payload:', payload);
+      
+      const { data } = await api.post('/leads', payload);
+      console.log('API: Lead creation response:', data);
+      return data;
+    } catch (error) {
+      console.error('API: Error creating lead:', error);
+      throw error;
+    }
   }
 };
 
 export const referral = {
   validateCode: async (code: string) => {
     try {
-      const { data } = await api.get(`/referral/codes?code=${encodeURIComponent(code)}`);
+      const { data } = await api.get(`/referral-code/${encodeURIComponent(code)}`);
       return data;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {

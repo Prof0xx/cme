@@ -230,10 +230,10 @@ export const services: Record<string, SelectedService[]> = {
 
 // Category min prices
 export const categoryMinPrices = {
-  "listings": 950,
-  "trendings": 300,
-  "pr": 200,
+  "listings": 650,
+  "trendings": 200,
+  "pr": 180,
   "dex-boosts": 185,
-  "botting": 150,
-  "startup": 100
+  "botting": 70,
+  "startup": 150
 };
