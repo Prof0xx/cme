@@ -1,5 +1,9 @@
-// Package service definitions (without prices)
-const budgetPackageServices = [
+interface PackageServiceDefinition {
+  category: string;
+  name: string;
+}
+
+export const budgetPackageServices: PackageServiceDefinition[] = [
   {category: "listings", name: "CoinGecko"},
   {category: "trendings", name: "GeckoTerminal - Pool Trends"},
   {category: "dex-boosts", name: "DEXScreener - Boost 30x"},
@@ -9,7 +13,7 @@ const budgetPackageServices = [
   {category: "botting", name: "DEX Screener Fire & Rocket Emojis"}
 ];
 
-const ballerPackageServices = [
+export const ballerPackageServices: PackageServiceDefinition[] = [
   {category: "listings", name: "CoinMarketCap"},
   {category: "listings", name: "CoinGecko"},
   {category: "trendings", name: "CoinMarketCap - Top 10"},
@@ -23,9 +27,4 @@ const ballerPackageServices = [
   {category: "botting", name: "Volume Bot"},
   {category: "botting", name: "Bundle Bot"},
   {category: "pr", name: "CoinMarketCape Article"}
-];
-
-module.exports = {
-  budgetPackageServices,
-  ballerPackageServices
-}; 
+]; 

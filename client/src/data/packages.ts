@@ -1,5 +1,5 @@
 import type { SelectedService } from "@shared/schema";
-import { budgetPackageServices, ballerPackageServices } from "@shared/packages";
+import { budgetPackageServices, ballerPackageServices } from "@shared/constants/packages";
 
 export { budgetPackageServices, ballerPackageServices };
 
