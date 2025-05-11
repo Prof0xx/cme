@@ -1,12 +1,17 @@
 import { useStrategyBoard } from "@/context/StrategyBoardContext";
 import { Button } from "@/components/ui/button";
-import { packageDetails, ballerPackage } from "@/data/packages";
+import { packageDetails, ballerPackage, budgetPackage } from "@/data/packages";
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 const PackagesSection = () => {
   const { selectPackage } = useStrategyBoard();
   const [showMoreServices, setShowMoreServices] = useState(false);
+
+  // Format price with commas
+  const formatPrice = (price: number) => {
+    return `$${price.toLocaleString()}`;
+  };
 
   return (
     <section className="mb-10">
@@ -21,8 +26,8 @@ const PackagesSection = () => {
               <span className={`${packageDetails.budget.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>15% OFF</span>
             </div>
             <div className="flex items-baseline mb-4">
-              <span className="text-gray-400 text-lg line-through mr-2">Prices</span>
-              <span className="text-white text-2xl font-bold">Under Revision</span>
+              <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(packageDetails.budget.originalPrice)}</span>
+              <span className="text-white text-2xl font-bold">{formatPrice(packageDetails.budget.discountedPrice)}</span>
             </div>
             <Button
               onClick={() => selectPackage('budget')}
@@ -34,34 +39,14 @@ const PackagesSection = () => {
           <div className="p-6">
             <h4 className="text-gray-400 text-sm uppercase font-medium mb-3">Included Services</h4>
             <ul className="space-y-3">
-              <li className="flex justify-between">
-                <span className="text-gray-300">CoinGecko Listing</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">GeckoTerminal Pool Trends</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">DEXScreener - Boost 30x</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">Reddit Campaign (Multiple subreddits and trends)</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">Bitcointalk Post w/ Images</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">Telegram Reactions (1000)</span>
-                <span className="text-gray-400">TBD per 1000</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">DEX Screener Fire & Rocket Emojis</span>
-                <span className="text-gray-400">TBD per 400</span>
-              </li>
+              {budgetPackage.map((service, index) => (
+                <li key={index} className="flex justify-between">
+                  <span className="text-gray-300">{service.name}</span>
+                  <span className="text-gray-400">
+                    {typeof service.price === 'number' ? formatPrice(service.price) : service.price}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -74,8 +59,8 @@ const PackagesSection = () => {
               <span className={`${packageDetails.baller.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>15% OFF</span>
             </div>
             <div className="flex items-baseline mb-4">
-              <span className="text-gray-400 text-lg line-through mr-2">Prices</span>
-              <span className="text-white text-2xl font-bold">Under Revision</span>
+              <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(packageDetails.baller.originalPrice)}</span>
+              <span className="text-white text-2xl font-bold">{formatPrice(packageDetails.baller.discountedPrice)}</span>
             </div>
             <Button
               onClick={() => selectPackage('baller')}
@@ -87,77 +72,29 @@ const PackagesSection = () => {
           <div className="p-6">
             <h4 className="text-gray-400 text-sm uppercase font-medium mb-3">Included Services</h4>
             <ul className="space-y-3">
-              <li className="flex justify-between">
-                <span className="text-gray-300">CoinMarketCap Fast Listing</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">CoinGecko Fast Listing</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">CoinMarketCap - Top 10</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">Dexscreener Ad – 100k views</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">GeckoTerminal Pool Trends</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">DEXTools - Nitro 1000</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-gray-300">Binance Article</span>
-                <span className="text-gray-400">TBD</span>
-              </li>
-              <li 
-                className="flex justify-between items-center cursor-pointer text-primary-400 hover:text-primary-300 transition-colors"
-                onClick={() => setShowMoreServices(!showMoreServices)}
-              >
-                <span className="text-gray-300 flex items-center">
-                  {showMoreServices ? (
-                    <ChevronUp className="w-4 h-4 mr-1" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 mr-1" />
-                  )}
-                  {showMoreServices ? "Hide premium services" : "+ 6 more premium services"}
-                </span>
-                <span className="text-gray-400">See Details</span>
-              </li>
-              
-              {/* Hidden services */}
-              {showMoreServices && (
-                <div className="border-t border-gray-800 pt-3 mt-2 space-y-3 pl-5">
-                  <li className="flex justify-between">
-                    <span className="text-gray-400">Twitter Followers</span>
-                    <span className="text-gray-500">TBD per 1000</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-400">DEXTools Community Trust Votes</span>
-                    <span className="text-gray-500">TBD per 200</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-400">DEX Screener Fire & Rocket Emojis</span>
-                    <span className="text-gray-500">TBD per 400</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-400">Volume Bot</span>
-                    <span className="text-gray-500">Custom</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-400">Bundle Bot</span>
-                    <span className="text-gray-500">Custom</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-400">CoinMarketCape Article</span>
-                    <span className="text-gray-500">TBD</span>
-                  </li>
-                </div>
+              {ballerPackage.slice(0, showMoreServices ? undefined : 7).map((service, index) => (
+                <li key={index} className="flex justify-between">
+                  <span className="text-gray-300">{service.name}</span>
+                  <span className="text-gray-400">
+                    {typeof service.price === 'number' ? formatPrice(service.price) : service.price}
+                  </span>
+                </li>
+              ))}
+              {ballerPackage.length > 7 && (
+                <li 
+                  className="flex justify-between items-center cursor-pointer text-primary-400 hover:text-primary-300 transition-colors"
+                  onClick={() => setShowMoreServices(!showMoreServices)}
+                >
+                  <span className="text-gray-300 flex items-center">
+                    {showMoreServices ? (
+                      <ChevronUp className="w-4 h-4 mr-1" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 mr-1" />
+                    )}
+                    {showMoreServices ? "Hide premium services" : `+ ${ballerPackage.length - 7} more premium services`}
+                  </span>
+                  <span className="text-gray-400">See Details</span>
+                </li>
               )}
             </ul>
           </div>
