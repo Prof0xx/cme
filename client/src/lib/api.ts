@@ -96,7 +96,7 @@ export const referral = {
   validateCode: async (code: string) => {
     try {
       console.log(`API: Validating referral code: ${code}`);
-      const { data } = await api.get(`/referral-code/${encodeURIComponent(code)}`);
+      const { data } = await api.get(`/referral/validate/${encodeURIComponent(code)}`);
       console.log(`API: Referral validation response:`, data);
       return data;
     } catch (error) {

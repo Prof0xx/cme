@@ -408,31 +408,12 @@ ${requestedService}${referralInfo}
     try {
       const { code } = req.params;
       
-      if (!code || typeof code !== 'string') {
-        return res.status(400).json({ 
-          message: "Invalid referral code format",
-          valid: false
-        });
-      }
-
-      const referralCode = await storage.getReferralCodeByCode(code);
-
-      if (!referralCode || !referralCode.isActive) {
-        return res.status(404).json({ 
-          message: "Referral code not found or inactive", 
-          valid: false
-        });
-      }
-
-      return res.status(200).json({
-        valid: true,
-        discount: referralCode.discountPercent,
-        message: `Referral code valid! You'll receive ${referralCode.discountPercent}% discount.`
-      });
+      // Redirect to the consolidated endpoint
+      return res.redirect(`/api/referral/validate/${code}`);
     } catch (error) {
-      console.error("Error validating referral code:", error);
+      console.error("Error redirecting to consolidated referral endpoint:", error);
       return res.status(500).json({
-        message: "Failed to validate referral code. Please try again later.",
+        message: "Internal server error. Please try again later.",
         valid: false
       });
     }
