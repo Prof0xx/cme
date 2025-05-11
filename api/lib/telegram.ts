@@ -47,7 +47,6 @@ function formatDefaultMessage(lead: TelegramNotificationOptions): string {
   // Build the message
   let message = `🚀 New Lead!\n\n`;
   message += `Telegram: ${telegram}\n`;
-  message += `Total Value: $${totalValue}\n`;
   
   // Add referral and discount info if present
   if (referralCode && referralCodeDetails) {
@@ -57,11 +56,13 @@ function formatDefaultMessage(lead: TelegramNotificationOptions): string {
       discountApplied
     });
     
-    message += `\n📋 Referral Details:\n`;
+    message += `📋 Referral Details:\n`;
     message += `Code Used: ${referralCode}\n`;
     message += `Referred By: ${referralCodeDetails.creatorTelegram}\n`;
     
     if (typeof discountApplied === 'number' && discountApplied > 0) {
+      // Use the exact discount amount that was calculated in the client
+      // rather than recalculating it from the total
       const finalTotal = totalValue - discountApplied;
       const commissionAmount = Math.round((finalTotal * referralCodeDetails.commissionPercent) / 100);
       
@@ -73,13 +74,16 @@ function formatDefaultMessage(lead: TelegramNotificationOptions): string {
         commissionPercent: referralCodeDetails.commissionPercent
       });
       
+      message += `Total Value: $${totalValue}\n`;
       message += `Discount: $${discountApplied} (${referralCodeDetails.discountPercent}%)\n`;
       message += `Final Total: $${finalTotal}\n`;
       message += `Commission: $${commissionAmount} (${referralCodeDetails.commissionPercent}%)\n`;
     } else {
+      message += `Total Value: $${totalValue}\n`;
       console.log('⚠️ No discount applied');
     }
   } else {
+    message += `Total Value: $${totalValue}\n`;
     console.log('ℹ️ No referral code or details present');
   }
   
