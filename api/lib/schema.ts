@@ -107,7 +107,16 @@ export type InsertService = z.infer<typeof insertServiceSchema>;
 export type Service = typeof services.$inferSelect;
 
 export type InsertLead = z.infer<typeof insertLeadSchema>;
-export type Lead = typeof leads.$inferSelect;
+export type Lead = {
+  id: number;
+  telegram: string;
+  selectedServices: string | any[];
+  totalValue: number;
+  message: string | null;
+  createdAt: string;
+  referralCode: string | null;
+  discountApplied: number;
+};
 
 export type InsertReferralCode = z.infer<typeof insertReferralCodeSchema>;
 export type ReferralCode = typeof referralCodes.$inferSelect;
