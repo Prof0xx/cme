@@ -871,6 +871,7 @@ ${message ? `Message:\\n${message}` : ''}
   app.get('/api/package-prices', async (_req: Request, res: Response) => {
     try {
       const allServices = await storage.getAllServices();
+      console.log('All services:', allServices); // Debug log
       
       // Helper function to calculate package price
       const calculatePackagePrice = (packageServices: {category: string, name: string}[]) => {
@@ -884,38 +885,17 @@ ${message ? `Message:\\n${message}` : ''}
           );
           
           if (service) {
+            console.log('Found service:', service); // Debug log
             const price = service.price;
-            if (typeof price === 'number') {
-              total += price;
-            } else if (typeof price === 'string') {
-              // Skip special price indicators
-              if (price.toLowerCase().includes('tbd') || 
-                  price.toLowerCase().includes('custom') ||
-                  price.toLowerCase().includes('free')) {
-                hasAllPrices = false;
-                return;
-              }
-              
-              // Handle price ranges by taking the lower number
-              if (price.includes('-')) {
-                const [min] = price.split('-');
-                const match = min.match(/\d+/);
-                if (match) {
-                  total += parseInt(match[0], 10);
-                  return;
-                }
-              }
-              
-              // Extract numeric value
-              const match = price.match(/\d+/);
-              if (match) {
-                total += parseInt(match[0], 10);
-                return;
-              }
-              
+            const numericPrice = typeof price === 'number' ? price : parseFloat(price);
+            
+            if (!isNaN(numericPrice) && numericPrice > 0) {
+              total += numericPrice;
+            } else {
               hasAllPrices = false;
             }
           } else {
+            console.log('Service not found:', packageService); // Debug log
             hasAllPrices = false;
           }
         });
@@ -929,6 +909,8 @@ ${message ? `Message:\\n${message}` : ''}
       // Calculate prices
       const budgetTotal = calculatePackagePrice(budgetPackageServices);
       const ballerTotal = calculatePackagePrice(ballerPackageServices);
+      
+      console.log('Package totals:', { budgetTotal, ballerTotal }); // Debug log
       
       return res.status(200).json({
         budget: budgetTotal === null ? {

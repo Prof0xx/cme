@@ -83,8 +83,7 @@ const ServiceCategory = ({ category, minPrice, onSelect, isActive = false }: Ser
   };
 
   const formatPrice = (price: number | null) => {
-    if (price === null) return 'Custom';
-    if (price === 0) return 'Free';
+    if (price === null || price === 0) return 'Custom';
     return `$${price}+`;
   };
 

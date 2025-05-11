@@ -8,8 +8,8 @@ const PackagesSection = () => {
   const { selectPackage } = useStrategyBoard();
   const [showMoreServices, setShowMoreServices] = useState(false);
   const [packagePrices, setPackagePrices] = useState<{
-    budget: { originalPrice: number; discountedPrice: number };
-    baller: { originalPrice: number; discountedPrice: number };
+    budget: { originalPrice: number | null; discountedPrice: number | null };
+    baller: { originalPrice: number | null; discountedPrice: number | null };
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -19,6 +19,7 @@ const PackagesSection = () => {
         const response = await fetch('/api/package-prices');
         if (!response.ok) throw new Error('Failed to fetch package prices');
         const data = await response.json();
+        console.log('Package prices response:', data); // Debug log
         setPackagePrices(data);
       } catch (error) {
         console.error('Error fetching package prices:', error);
