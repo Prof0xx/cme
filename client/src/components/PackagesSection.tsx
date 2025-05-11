@@ -31,7 +31,8 @@ const PackagesSection = () => {
   }, []);
 
   // Format price with commas
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | null) => {
+    if (price === null) return 'Custom';
     return `$${price.toLocaleString()}`;
   };
 
@@ -81,7 +82,9 @@ const PackagesSection = () => {
               <h3 className="text-xl font-semibold text-white">Budget-Friendly Package</h3>
               <span className={`${packageDetails.budget.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>15% OFF</span>
             </div>
-            {packagePrices && (
+            {packagePrices?.budget.originalPrice === null ? (
+              <div className="text-gray-400 text-lg mb-4">Custom Pricing</div>
+            ) : packagePrices && (
               <div className="flex items-baseline mb-4">
                 <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(packagePrices.budget.originalPrice)}</span>
                 <span className="text-white text-2xl font-bold">{formatPrice(packagePrices.budget.discountedPrice)}</span>
@@ -113,7 +116,9 @@ const PackagesSection = () => {
               <h3 className="text-xl font-semibold text-white">Baller Package</h3>
               <span className={`${packageDetails.baller.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>15% OFF</span>
             </div>
-            {packagePrices && (
+            {packagePrices?.baller.originalPrice === null ? (
+              <div className="text-gray-400 text-lg mb-4">Custom Pricing</div>
+            ) : packagePrices && (
               <div className="flex items-baseline mb-4">
                 <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(packagePrices.baller.originalPrice)}</span>
                 <span className="text-white text-2xl font-bold">{formatPrice(packagePrices.baller.discountedPrice)}</span>

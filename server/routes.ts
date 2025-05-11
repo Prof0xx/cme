@@ -164,23 +164,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const prices = servicesInCategory
           .map(service => {
             const price = service.price;
+            // Skip any non-numeric or special prices
             if (typeof price === 'string') {
-              // Extract first numeric value from any string format
-              const match = price.match(/\d+/);
-              if (match) {
-                return parseInt(match[0], 10);
+              if (price.toLowerCase().includes('tbd') || 
+                  price.toLowerCase().includes('custom') ||
+                  price.toLowerCase().includes('free')) {
+                return null;
               }
-              return NaN;
+              // Handle price ranges by taking the lower number
+              if (price.includes('-')) {
+                const [min] = price.split('-');
+                const match = min.match(/\d+/);
+                return match ? parseInt(match[0], 10) : null;
+              }
+              // Extract numeric value
+              const match = price.match(/\d+/);
+              return match ? parseInt(match[0], 10) : null;
             }
-            return price;
+            return typeof price === 'number' ? price : null;
           })
-          .filter(price => !isNaN(price));
+          .filter((price): price is number => price !== null && !isNaN(price));
         
-        if (prices.length > 0) {
-          categoryMinPrices[category] = Math.min(...prices);
-        } else {
-          categoryMinPrices[category] = null; // No numeric price found
-        }
+        categoryMinPrices[category] = prices.length > 0 ? Math.min(...prices) : null;
       });
       
       return res.status(200).json({
@@ -886,6 +891,7 @@ ${message ? `Message:\\n${message}` : ''}
       // Helper function to calculate package price
       const calculatePackagePrice = (packageServices: {category: string, name: string}[]) => {
         let total = 0;
+        let hasAllPrices = true;
         
         packageServices.forEach(packageService => {
           const service = allServices.find(s => 
@@ -898,55 +904,60 @@ ${message ? `Message:\\n${message}` : ''}
             if (typeof price === 'number') {
               total += price;
             } else if (typeof price === 'string') {
-              // Extract first number from any string format
+              // Skip special price indicators
+              if (price.toLowerCase().includes('tbd') || 
+                  price.toLowerCase().includes('custom') ||
+                  price.toLowerCase().includes('free')) {
+                hasAllPrices = false;
+                return;
+              }
+              
+              // Handle price ranges by taking the lower number
+              if (price.includes('-')) {
+                const [min] = price.split('-');
+                const match = min.match(/\d+/);
+                if (match) {
+                  total += parseInt(match[0], 10);
+                  return;
+                }
+              }
+              
+              // Extract numeric value
               const match = price.match(/\d+/);
               if (match) {
                 total += parseInt(match[0], 10);
+                return;
               }
+              
+              hasAllPrices = false;
             }
+          } else {
+            hasAllPrices = false;
           }
         });
         
-        return total;
+        return hasAllPrices ? total : null;
       };
 
-      // Package service definitions
-      const budgetPackageServices = [
-        {category: "listings", name: "CoinGecko"},
-        {category: "trendings", name: "GeckoTerminal - Pool Trends"},
-        {category: "dex-boosts", name: "DEXScreener - Boost 30x"},
-        {category: "pr", name: "Reddit Campaign (Multiple subreddits and trends)"},
-        {category: "pr", name: "Bitcointalk Post w/ Images"},
-        {category: "botting", name: "Telegram Reactions"},
-        {category: "botting", name: "DEX Screener Fire & Rocket Emojis"}
-      ];
-
-      const ballerPackageServices = [
-        {category: "listings", name: "CoinMarketCap"},
-        {category: "listings", name: "CoinGecko"},
-        {category: "trendings", name: "CoinMarketCap - Top 10"},
-        {category: "pr", name: "Dexscreener Ad – 100k views"},
-        {category: "trendings", name: "GeckoTerminal - Pool Trends"},
-        {category: "dex-boosts", name: "DEXTools - Nitro 1000"},
-        {category: "pr", name: "Binance Article"},
-        {category: "botting", name: "Twitter Followers"},
-        {category: "botting", name: "DEXTools Community Trust Votes"},
-        {category: "botting", name: "DEX Screener Fire & Rocket Emojis"},
-        {category: "botting", name: "Volume Bot"},
-        {category: "botting", name: "Bundle Bot"},
-        {category: "pr", name: "CoinMarketCape Article"}
-      ];
+      // Import package service definitions from shared constants
+      const { budgetPackageServices, ballerPackageServices } = require('../../shared/constants/packages');
       
       // Calculate prices
       const budgetTotal = calculatePackagePrice(budgetPackageServices);
       const ballerTotal = calculatePackagePrice(ballerPackageServices);
       
       return res.status(200).json({
-        budget: {
+        budget: budgetTotal === null ? {
+          originalPrice: null,
+          discountedPrice: null
+        } : {
           originalPrice: budgetTotal,
           discountedPrice: Math.floor(budgetTotal * 0.85) // 15% discount
         },
-        baller: {
+        baller: ballerTotal === null ? {
+          originalPrice: null,
+          discountedPrice: null
+        } : {
           originalPrice: ballerTotal,
           discountedPrice: Math.floor(ballerTotal * 0.85) // 15% discount
         }
