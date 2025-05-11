@@ -165,11 +165,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .map(service => {
             const price = service.price;
             if (typeof price === 'string') {
-              // Handle ranges like "200-400" or just numbers as strings
-              if (price.includes('-')) {
-                return parseInt(price.split('-')[0], 10);
+              // Extract first numeric value from any string format
+              const match = price.match(/\d+/);
+              if (match) {
+                return parseInt(match[0], 10);
               }
-              return parseInt(price, 10);
+              return NaN;
             }
             return price;
           })
@@ -873,6 +874,63 @@ ${message ? `Message:\\n${message}` : ''}
       console.error(`Error fetching leads for referral code ${req.params.code}:`, error);
       return res.status(500).json({
         message: "Failed to fetch leads. Please try again later."
+      });
+    }
+  });
+
+  // API endpoint to get package prices
+  app.get('/api/package-prices', async (_req: Request, res: Response) => {
+    try {
+      const allServices = await storage.getAllServices();
+      
+      // Helper function to calculate package price
+      const calculatePackagePrice = (packageServices: {category: string, name: string}[]) => {
+        let total = 0;
+        
+        packageServices.forEach(packageService => {
+          const service = allServices.find(s => 
+            s.category === packageService.category && 
+            s.name === packageService.name
+          );
+          
+          if (service) {
+            const price = service.price;
+            if (typeof price === 'number') {
+              total += price;
+            } else if (typeof price === 'string') {
+              // Extract first number from any string format
+              const match = price.match(/\d+/);
+              if (match) {
+                total += parseInt(match[0], 10);
+              }
+            }
+          }
+        });
+        
+        return total;
+      };
+
+      // Import package service definitions
+      const { budgetPackageServices, ballerPackageServices } = require('../../shared/packages');
+      
+      // Calculate prices
+      const budgetTotal = calculatePackagePrice(budgetPackageServices);
+      const ballerTotal = calculatePackagePrice(ballerPackageServices);
+      
+      return res.status(200).json({
+        budget: {
+          originalPrice: budgetTotal,
+          discountedPrice: Math.floor(budgetTotal * 0.85) // 15% discount
+        },
+        baller: {
+          originalPrice: ballerTotal,
+          discountedPrice: Math.floor(ballerTotal * 0.85) // 15% discount
+        }
+      });
+    } catch (error) {
+      console.error("Error calculating package prices:", error);
+      return res.status(500).json({
+        message: "Failed to calculate package prices. Please try again later."
       });
     }
   });
