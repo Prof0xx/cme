@@ -181,7 +181,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
             
             await sendTelegramNotification({
-              ...lead,
+              id: lead.id,
+              telegram: lead.telegram,
+              selectedServices: lead.selectedServices,
+              totalValue: lead.totalValue,
+              message: lead.message,
+              createdAt: lead.createdAt,
               referralCode: referralCodeData?.code ?? null,
               discountApplied: validatedData.discountApplied ?? 0,
               referralCodeDetails: referralCodeData ? {
