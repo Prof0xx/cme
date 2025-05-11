@@ -163,11 +163,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const servicesInCategory = allServices.filter(service => service.category === category);
         const prices = servicesInCategory
           .map(service => {
-            // Convert price to number, preserving original format
-            const numericPrice = parseFloat(service.price.toString());
+            const price = service.price;
+            if (price === null || price === 'Custom' || typeof price === 'undefined') {
+              return null;
+            }
+            if (typeof price === 'number') {
+              return price;
+            }
+            // Handle "X per Y" format
+            if (typeof price === 'string' && price.includes('per')) {
+              const basePrice = parseInt(price.split(' ')[0]);
+              return !isNaN(basePrice) ? basePrice : null;
+            }
+            // Try to parse as number
+            const numericPrice = parseFloat(price.toString());
             return !isNaN(numericPrice) ? numericPrice : null;
           })
-          .filter((price): price is number => price !== null);
+          .filter((price): price is number => price !== null && price > 0);
         
         categoryMinPrices[category] = prices.length > 0 ? Math.min(...prices) : null;
       });
@@ -887,8 +899,31 @@ ${message ? `Message:\\n${message}` : ''}
           if (service) {
             console.log('Found service:', service); // Debug log
             const price = service.price;
-            const numericPrice = typeof price === 'number' ? price : parseFloat(price);
             
+            // Handle different price formats
+            if (price === null || price === 'Custom' || typeof price === 'undefined') {
+              hasAllPrices = false;
+              return;
+            }
+            
+            if (typeof price === 'number') {
+              total += price;
+              return;
+            }
+            
+            // Handle "X per Y" format
+            if (typeof price === 'string' && price.includes('per')) {
+              const basePrice = parseInt(price.split(' ')[0]);
+              if (!isNaN(basePrice) && basePrice > 0) {
+                total += basePrice;
+                return;
+              }
+              hasAllPrices = false;
+              return;
+            }
+            
+            // Try to parse as number
+            const numericPrice = parseFloat(price.toString());
             if (!isNaN(numericPrice) && numericPrice > 0) {
               total += numericPrice;
             } else {
