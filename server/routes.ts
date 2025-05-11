@@ -156,41 +156,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       const categories = Array.from(categoriesSet);
       
-      // Get the minimum price for each category
-      const categoryMinPrices: Record<string, number | null> = {};
+      // Hard-coded minimum prices as requested
+      const categoryMinPrices: Record<string, number | null> = {
+        "listings": 650,
+        "trendings": 200,
+        "pr": 200,
+        "dex-boosts": 185,
+        "botting": 150,
+        "startup": 100
+      };
       
-      categories.forEach(category => {
-        const servicesInCategory = allServices.filter(service => service.category === category);
-        
-        // First try to find numeric prices
-        const numericPrices = servicesInCategory
-          .map(service => {
-            const price = service.price;
-            
-            // Skip null, undefined, or special string values
-            if (!price || price === 'Custom' || price === 'tbd') {
-              return null;
-            }
-            
-            // Handle "X per Y" format
-            if (typeof price === 'string' && price.includes('per')) {
-              const basePrice = parseInt(price.split(' ')[0]);
-              return !isNaN(basePrice) && basePrice > 0 ? basePrice : null;
-            }
-            
-            // Try to parse as number
-            const numericPrice = parseFloat(price.toString());
-            return !isNaN(numericPrice) && numericPrice > 0 ? numericPrice : null;
-          })
-          .filter((price): price is number => price !== null);
-        
-        // Set the minimum price if we found any numeric prices
-        categoryMinPrices[category] = numericPrices.length > 0 ? Math.min(...numericPrices) : null;
-        
-        console.log(`Category ${category} prices:`, numericPrices); // Debug log
-      });
-      
-      console.log('Final category min prices:', categoryMinPrices); // Debug log
+      console.log('Hardcoded category min prices:', categoryMinPrices); // Debug log
       
       return res.status(200).json({
         categories,
