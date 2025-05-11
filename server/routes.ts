@@ -163,27 +163,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const servicesInCategory = allServices.filter(service => service.category === category);
         const prices = servicesInCategory
           .map(service => {
-            const price = service.price;
-            // Skip any non-numeric or special prices
-            if (typeof price === 'string') {
-              if (price.toLowerCase().includes('tbd') || 
-                  price.toLowerCase().includes('custom') ||
-                  price.toLowerCase().includes('free')) {
-                return null;
-              }
-              // Handle price ranges by taking the lower number
-              if (price.includes('-')) {
-                const [min] = price.split('-');
-                const match = min.match(/\d+/);
-                return match ? parseInt(match[0], 10) : null;
-              }
-              // Extract numeric value
-              const match = price.match(/\d+/);
-              return match ? parseInt(match[0], 10) : null;
-            }
-            return typeof price === 'number' ? price : null;
+            // Convert price to number, preserving original format
+            const numericPrice = parseFloat(service.price.toString());
+            return !isNaN(numericPrice) ? numericPrice : null;
           })
-          .filter((price): price is number => price !== null && !isNaN(price));
+          .filter((price): price is number => price !== null);
         
         categoryMinPrices[category] = prices.length > 0 ? Math.min(...prices) : null;
       });
