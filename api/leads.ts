@@ -133,33 +133,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 leadId: lead.id,
                 referralCodeId: referralCodeData.id,
                 commissionAmount,
-                isPaid: false,
-                createdAt: new Date()
+                isPaid: false
               });
               
               console.log('✅ Referral tracking created:', tracking);
               
               // Notify referrer
-              const referrerMessage = `🎉 New Lead with Your Code!\n\n` +
-                `Code Used: ${referralCodeData.code}\n` +
-                `Lead Value: $${validatedData.totalValue}\n` +
-                `Final Total: $${finalTotal}\n` +
-                `Commission: $${commissionAmount} (${referralCodeData.commissionPercent}%)\n\n` +
-                `The lead will be contacted soon.`;
-              
-              console.log('📨 Sending referrer notification:', {
-                to: referralCodeData.creatorTelegram,
-                message: referrerMessage
-              });
-              
-              try {
-                await sendDirectTelegramMessage(
-                  referralCodeData.creatorTelegram,
-                  referrerMessage
-                );
-                console.log('✅ Referrer notification sent');
-              } catch (error) {
-                console.error('❌ Failed to send referrer notification:', error);
+              if (referralCodeData.creatorTelegram) {
+                const referrerMessage = `🎉 New Lead with Your Code!\n\n` +
+                  `Code Used: ${referralCodeData.code}\n` +
+                  `Lead Value: $${validatedData.totalValue}\n` +
+                  `Final Total: $${finalTotal}\n` +
+                  `Commission: $${commissionAmount} (${referralCodeData.commissionPercent}%)\n\n` +
+                  `The lead will be contacted soon.`;
+                
+                console.log('📨 Sending referrer notification:', {
+                  to: referralCodeData.creatorTelegram,
+                  message: referrerMessage
+                });
+                
+                try {
+                  await sendDirectTelegramMessage(
+                    referralCodeData.creatorTelegram,
+                    referrerMessage
+                  );
+                  console.log('✅ Referrer notification sent');
+                } catch (error) {
+                  console.error('❌ Failed to send referrer notification:', error);
+                }
               }
             } catch (error) {
               console.error('❌ Error handling referral:', error);
@@ -170,8 +171,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           try {
             console.log('🔔 Preparing admin notification with data:', {
               lead,
-              referralCode: referralCodeData?.code,
-              discountApplied: validatedData.discountApplied,
+              referralCode: referralCodeData?.code ?? null,
+              discountApplied: validatedData.discountApplied ?? 0,
               referralDetails: referralCodeData ? {
                 discountPercent: referralCodeData.discountPercent,
                 commissionPercent: referralCodeData.commissionPercent,
@@ -179,21 +180,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               } : null
             });
             
-            try {
-              await sendTelegramNotification({
-                ...lead,
-                referralCode: referralCodeData?.code,
-                discountApplied: validatedData.discountApplied,
-                referralCodeDetails: referralCodeData ? {
-                  discountPercent: referralCodeData.discountPercent,
-                  commissionPercent: referralCodeData.commissionPercent,
-                  creatorTelegram: referralCodeData.creatorTelegram
-                } : null
-              });
-              console.log('✅ Admin notification sent');
-            } catch (error) {
-              console.error('❌ Failed to send admin notification:', error);
-            }
+            await sendTelegramNotification({
+              ...lead,
+              referralCode: referralCodeData?.code ?? null,
+              discountApplied: validatedData.discountApplied ?? 0,
+              referralCodeDetails: referralCodeData ? {
+                discountPercent: referralCodeData.discountPercent ?? 0,
+                commissionPercent: referralCodeData.commissionPercent ?? 0,
+                creatorTelegram: referralCodeData.creatorTelegram ?? ''
+              } : undefined
+            });
+            console.log('✅ Admin notification sent');
           } catch (telegramError) {
             console.error('❌ Failed to send admin notification:', telegramError);
           }
