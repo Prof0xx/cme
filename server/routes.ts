@@ -161,28 +161,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       categories.forEach(category => {
         const servicesInCategory = allServices.filter(service => service.category === category);
-        const prices = servicesInCategory
+        
+        // First try to find numeric prices
+        const numericPrices = servicesInCategory
           .map(service => {
             const price = service.price;
-            if (price === null || price === 'Custom' || typeof price === 'undefined') {
-              return null;
-            }
-            if (typeof price === 'number') {
+            
+            // Handle direct numeric values
+            if (typeof price === 'number' && price > 0) {
               return price;
             }
+            
             // Handle "X per Y" format
             if (typeof price === 'string' && price.includes('per')) {
               const basePrice = parseInt(price.split(' ')[0]);
-              return !isNaN(basePrice) ? basePrice : null;
+              return !isNaN(basePrice) && basePrice > 0 ? basePrice : null;
             }
-            // Try to parse as number
-            const numericPrice = parseFloat(price.toString());
-            return !isNaN(numericPrice) ? numericPrice : null;
+            
+            // Try to parse as number if it's a string
+            if (typeof price === 'string' && !['Custom', 'tbd'].includes(price)) {
+              const numericPrice = parseFloat(price);
+              return !isNaN(numericPrice) && numericPrice > 0 ? numericPrice : null;
+            }
+            
+            return null;
           })
-          .filter((price): price is number => price !== null && price > 0);
+          .filter((price): price is number => price !== null);
         
-        categoryMinPrices[category] = prices.length > 0 ? Math.min(...prices) : null;
+        // Set the minimum price if we found any numeric prices
+        categoryMinPrices[category] = numericPrices.length > 0 ? Math.min(...numericPrices) : null;
       });
+      
+      console.log('Category min prices:', categoryMinPrices); // Debug log
       
       return res.status(200).json({
         categories,
