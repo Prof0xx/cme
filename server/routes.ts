@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const categories = Array.from(categoriesSet);
       
       // Get the minimum price for each category
-      const categoryMinPrices: Record<string, number> = {};
+      const categoryMinPrices: Record<string, number | null> = {};
       
       categories.forEach(category => {
         const servicesInCategory = allServices.filter(service => service.category === category);
@@ -174,8 +174,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return price;
           })
           .filter(price => !isNaN(price));
-          
-        categoryMinPrices[category] = Math.min(...prices);
+        
+        if (prices.length > 0) {
+          categoryMinPrices[category] = Math.min(...prices);
+        } else {
+          categoryMinPrices[category] = null; // No numeric price found
+        }
       });
       
       return res.status(200).json({

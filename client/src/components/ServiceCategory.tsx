@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 interface ServiceCategoryProps {
   category: string;
-  minPrice: number;
+  minPrice: number | null;
   onSelect: (category: string) => void;
   isActive?: boolean;
 }
@@ -82,7 +82,8 @@ const ServiceCategory = ({ category, minPrice, onSelect, isActive = false }: Ser
     }
   };
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | null) => {
+    if (price === null) return 'Custom';
     if (price === 0) return 'Free';
     return `$${price}+`;
   };
