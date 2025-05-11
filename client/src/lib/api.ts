@@ -72,9 +72,10 @@ export const leads = {
     try {
       console.log('API: Creating lead with data:', lead);
       
-      // Make sure the referral code is explicitly set if valid
+      // Make sure the referralCode is explicitly set to null if falsy
       const payload = {
         ...lead,
+        // Use null instead of undefined for empty referral codes
         referralCode: lead.referralCode || null,
         discountApplied: lead.discountApplied || 0
       };
@@ -94,11 +95,14 @@ export const leads = {
 export const referral = {
   validateCode: async (code: string) => {
     try {
+      console.log(`API: Validating referral code: ${code}`);
       const { data } = await api.get(`/referral-code/${encodeURIComponent(code)}`);
+      console.log(`API: Referral validation response:`, data);
       return data;
     } catch (error) {
+      console.error(`API: Error validating referral code:`, error);
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return null;
+        return { valid: false, message: "Invalid referral code" };
       }
       throw error;
     }

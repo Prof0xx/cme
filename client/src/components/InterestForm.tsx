@@ -70,7 +70,13 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
       const referralData = await referral.validateCode(code);
       console.log('Referral validation response:', referralData);
       
-      const isValid = Boolean(referralData?.valid);
+      if (!referralData) {
+        setReferralCodeValid(false);
+        setReferralDiscount(0);
+        return;
+      }
+      
+      const isValid = Boolean(referralData.valid);
       setReferralCodeValid(isValid);
       setReferralDiscount(isValid ? referralData.discount : 0);
       
@@ -157,7 +163,7 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
       const discountAmount = referralCodeValid === true ? Math.round(subtotal * referralDiscount / 100) : 0;
 
       // Ensure referral code is properly set
-      const validReferralCode = referralCodeValid === true ? data.referralCode : undefined;
+      const validReferralCode = referralCodeValid === true ? data.referralCode : null;
       
       // Log the data being sent
       const leadData = {

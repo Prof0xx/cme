@@ -7,7 +7,7 @@ import { sendTelegramNotification, sendDirectTelegramMessage } from './lib/teleg
 const leadSchema = z.object({
   telegram: z.string().startsWith('@'),
   message: z.string().optional(),
-  referralCode: z.string().optional(),
+  referralCode: z.string().nullable().optional(),
   selectedServices: z.array(z.object({
     category: z.string(),
     name: z.string(),
