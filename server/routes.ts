@@ -167,9 +167,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .map(service => {
             const price = service.price;
             
-            // Handle direct numeric values
-            if (typeof price === 'number' && price > 0) {
-              return price;
+            // Skip null, undefined, or special string values
+            if (!price || price === 'Custom' || price === 'tbd') {
+              return null;
             }
             
             // Handle "X per Y" format
@@ -178,21 +178,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return !isNaN(basePrice) && basePrice > 0 ? basePrice : null;
             }
             
-            // Try to parse as number if it's a string
-            if (typeof price === 'string' && !['Custom', 'tbd'].includes(price)) {
-              const numericPrice = parseFloat(price);
-              return !isNaN(numericPrice) && numericPrice > 0 ? numericPrice : null;
-            }
-            
-            return null;
+            // Try to parse as number
+            const numericPrice = parseFloat(price.toString());
+            return !isNaN(numericPrice) && numericPrice > 0 ? numericPrice : null;
           })
           .filter((price): price is number => price !== null);
         
         // Set the minimum price if we found any numeric prices
         categoryMinPrices[category] = numericPrices.length > 0 ? Math.min(...numericPrices) : null;
+        
+        console.log(`Category ${category} prices:`, numericPrices); // Debug log
       });
       
-      console.log('Category min prices:', categoryMinPrices); // Debug log
+      console.log('Final category min prices:', categoryMinPrices); // Debug log
       
       return res.status(200).json({
         categories,
