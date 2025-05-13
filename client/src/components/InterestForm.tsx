@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { SelectedService } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { leads, referral } from "@/lib/api";
-import { useStrategyBoard } from "@/hooks/use-strategy-board";
+import { useStrategyBoard } from "@/context/StrategyBoardContext";
 
 interface InterestFormProps {
   isOpen: boolean;
