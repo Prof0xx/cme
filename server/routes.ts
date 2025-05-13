@@ -442,8 +442,14 @@ ${requestedService}${referralInfo}
       let discountAmount = 0;
       let referralCodeData = null;
       
-      // Verify referral code if provided
-      if (referralCode) {
+      // Check if a package is selected
+      const isPackageSelected = selectedServices.some(service => 
+        service.category === 'package' || 
+        (service.name && (service.name.includes('Package') || service.name.includes('package')))
+      );
+      
+      // Verify referral code if provided and no package is selected
+      if (referralCode && !isPackageSelected) {
         referralCodeData = await storage.getReferralCodeByCode(referralCode);
         
         if (!referralCodeData || !referralCodeData.isActive) {
@@ -455,6 +461,10 @@ ${requestedService}${referralInfo}
         // Calculate discount (5% by default or configured amount)
         const discountPercent = referralCodeData.discountPercent || 5;
         discountAmount = Math.round((totalValue * discountPercent) / 100);
+      } else if (referralCode && isPackageSelected) {
+        return res.status(400).json({
+          message: "Referral codes cannot be used with packages as they already include a discount"
+        });
       }
       
       // Convert selected services to JSON string for storage if needed

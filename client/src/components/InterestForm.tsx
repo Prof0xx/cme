@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { SelectedService } from "@shared/schema";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { leads, referral } from "@/lib/api";
+import { useStrategyBoard } from "@/hooks/use-strategy-board";
 
 interface InterestFormProps {
   isOpen: boolean;
@@ -46,6 +47,7 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
   const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
   const [referralDiscount, setReferralDiscount] = useState<number>(0);
   const { toast } = useToast();
+  const { isPackageSelected } = useStrategyBoard();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -61,6 +63,13 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
   const validateReferralCode = async (code: string) => {
     if (!code) {
       setReferralCodeValid(null);
+      setReferralDiscount(0);
+      return;
+    }
+
+    // Don't validate referral codes if a package is selected
+    if (isPackageSelected) {
+      setReferralCodeValid(false);
       setReferralDiscount(0);
       return;
     }
@@ -256,21 +265,31 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
               render={({ field }) => (
                 <FormItem className="mb-5">
                   <FormLabel className="text-gray-300">
-                    Referral Code <span className="text-gray-500">(optional)</span>
+                    Referral Code <span className="text-gray-500">(optional{isPackageSelected ? ' - not available with packages' : ''})</span>
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter referral code"
+                      placeholder={isPackageSelected ? "Referral codes cannot be used with packages" : "Enter referral code"}
                       className="w-full bg-dark-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
                       {...field}
                       onChange={(e) => {
                         field.onChange(e);
                         handleReferralCodeChange(e);
                       }}
+                      disabled={isPackageSelected}
                     />
                   </FormControl>
                   
-                  {referralCodeValid === true && (
+                  {isPackageSelected && field.value && (
+                    <Alert className="mt-2 bg-yellow-900/20 text-yellow-400 border border-yellow-800">
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      <AlertDescription>
+                        Referral codes cannot be used with packages as they already include a discount
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  {!isPackageSelected && referralCodeValid === true && (
                     <Alert className="mt-2 bg-green-900/20 text-green-400 border border-green-800">
                       <CheckCircle className="h-4 w-4 mr-2" />
                       <AlertDescription>
@@ -279,7 +298,7 @@ const InterestForm = ({ isOpen, onClose, onSuccess, selectedServices, totalValue
                     </Alert>
                   )}
                   
-                  {referralCodeValid === false && (
+                  {!isPackageSelected && referralCodeValid === false && (
                     <Alert className="mt-2 bg-red-900/20 text-red-400 border border-red-800">
                       <AlertCircle className="h-4 w-4 mr-2" />
                       <AlertDescription>
