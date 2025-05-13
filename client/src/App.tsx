@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import { StrategyBoardProvider } from "./context/StrategyBoardContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function Router() {
   return (
@@ -20,14 +21,16 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <StrategyBoardProvider>
-          <div className="app-container">
-            <Toaster />
-            <Router />
-          </div>
-        </StrategyBoardProvider>
-      </TooltipProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <StrategyBoardProvider>
+            <div className="app-container">
+              <Toaster />
+              <Router />
+            </div>
+          </StrategyBoardProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

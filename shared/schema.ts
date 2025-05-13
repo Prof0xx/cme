@@ -28,7 +28,7 @@ export const packages = pgTable('packages', {
   name: text('name').notNull(),
   description: text('description'),
   originalPrice: integer('original_price').notNull(),
-  discountPercent: integer('discount_percent').default(15),
+  discountPercent: integer('discount_percent').default(10),
   className: text('class_name'),
   buttonClassName: text('button_class_name'),
   discountBadgeClassName: text('discount_badge_class_name'),

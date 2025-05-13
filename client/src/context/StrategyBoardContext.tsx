@@ -112,9 +112,9 @@ export function StrategyBoardProvider({ children }: { children: ReactNode }) {
     }, 0);
   };
 
-  // Calculate discount (15% if package is selected)
+  // Calculate discount (10% if package is selected)
   const getDiscount = () => {
-    return isPackageSelected ? getSubtotal() * 0.15 : 0;
+    return isPackageSelected ? getSubtotal() * 0.10 : 0;
   };
 
   // Calculate total

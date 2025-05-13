@@ -40,7 +40,7 @@ const PackagesSection = () => {
           <div className={`bg-gradient-to-r ${packageDetails.budget.className} p-6`}>
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-xl font-semibold text-white">Budget-Friendly Package</h3>
-              <span className={`${packageDetails.budget.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>15% OFF</span>
+              <span className={`${packageDetails.budget.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>10% OFF</span>
             </div>
             <div className="flex items-baseline mb-4">
               <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(1985)}</span>
@@ -71,7 +71,7 @@ const PackagesSection = () => {
           <div className={`bg-gradient-to-r ${packageDetails.baller.className} p-6`}>
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-xl font-semibold text-white">Baller Package</h3>
-              <span className={`${packageDetails.baller.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>15% OFF</span>
+              <span className={`${packageDetails.baller.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>10% OFF</span>
             </div>
             <div className="flex items-baseline mb-4">
               <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(16930)}</span>

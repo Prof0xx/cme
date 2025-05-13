@@ -6,19 +6,19 @@
   "engines": {
     "node": "18.x"
   },
-"scripts": {
-  "dev": "cross-env NODE_ENV=development tsx server/index.ts",
-  "build:client": "cross-env NODE_ENV=production vite build",
-  "build:server": "tsc --noEmit",
-  "build": "npm run build:client && npm run build:server",
-  "start": "cross-env NODE_ENV=production node dist/server.js",
-  "check": "tsc",
-  "db:push": "drizzle-kit push",
-  "db:seed": "tsx scripts/seed-services.ts",
-  "update-deps": "npx update-browserslist-db@latest",
-  "preview": "vite preview",
-  "add-referral-codes": "tsx scripts/add-referral-codes.ts"
-},
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development tsx server/index.ts",
+    "build:client": "cross-env NODE_ENV=production vite build",
+    "build:server": "tsc --noEmit",
+    "build": "npm run build:client && npm run build:server",
+    "start": "cross-env NODE_ENV=production node dist/server.js",
+    "check": "tsc",
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx scripts/seed-services.ts",
+    "update-deps": "npx update-browserslist-db@latest",
+    "preview": "vite preview",
+    "add-referral-codes": "tsx scripts/add-referral-codes.ts"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
     "@jridgewell/trace-mapping": "^0.3.25",
@@ -59,7 +59,7 @@
     "connect-pg-simple": "^9.0.1",
     "csv-parse": "^5.6.0",
     "date-fns": "^3.3.1",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.5.0",
     "drizzle-orm": "^0.29.3",
     "drizzle-zod": "^0.5.1",
     "embla-carousel-react": "^8.0.0",
