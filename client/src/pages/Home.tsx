@@ -14,6 +14,11 @@ import { Flame, Zap, Rocket, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Base64 encoded fallback logos for partners
+const FALLBACK_DEXTOOLS = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABEUlEQVR4nO2ZMQ6DMAxFuQOVekZW7sDACXoBll7F7VDSgc2HPAu1UtOkJBZ88hCSPxHJl2cDlpVSKpVKRQLoADfQA82Cc4+Yi8QCWkTynBvtI3Kj58zBO6J9JKKkJeZEIJCsdxGJgMZGxIN+RH+rld3XuVciE7DfQKTn+aEbkez3VZM6B9vRn7YNBaJ9JKKkJeZEIJDm1cg/0s97JXIOt4NIr0oJgdb5HF2TOs0r4fsxPkSKbiO20l36xNwjIqndimT3QlNrYyXNI1J0ID1iDnvX3moFPgdSfhvZI+awN7anbSQgkLaRXUSS45+UnUBqt9Kt3QqBRNcoQNr1G9tGKkiqViqVSiUYFx8T+R2dvLkdAAAAAElFTkSuQmCC";
+const FALLBACK_DEXSCREENER = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACJUlEQVR4nO2aMU8UQRiG33sJBIdESENFQYKFUFIYC42WVPofbCj5BUQKS0IJNCbGmh9AYSU0JsRQaCLRSCxITEiAsNz5GN/gsjd7e7t3O7t7y32TlTs733zzPjvzze5MLoerCeBy4BpwA5gHukCICsAqsAPsAVupkJoG3lEOb1MhdK0y0Qd+AB+BR8AUsJoEsce/S2dgDJgDWsCvOIdDT0LeAlsxv02NqwBs+hCpKRMtg30+JHJnQUhsRApx+xm3eu4sCWnbhMySENtoAk+An6nldRb4X0IP8C5kz1U9qRntZAKGDboXQKNCoSawUGVGXgDjETFGgafAwUUIwan3jUwopRZrYSG6V6rx3ivZtYBvFQnpW7JrAQfeLfKJ2Ham7PrArndLPgHTBtvnQKcCoX2g7d2SO8AHYExM5Hgf6ZYspAe8BlreM7HBaqCYYTB1sODYM+FBCICPwHvgA3BPCeGddcEpnrD0AVJBCLwNRMTpAm+GkWnpwwvtQIScb8BDYBJYAVYkG7KuWfHcoFuKhJw2cE9E5IDrMgL1kBJKXnbKRf8BHAMNxdaQNspFugtckJB7gdSiB/h35gagFZqBpsh2lKnrlFMDmA0JQmNKXshDDSrE6LXvJLLypkGl5YVo94BHwGtJryMjcxB1Iy06dtISSkkehIpA9jH9Aj7JW0pnzM7PRcSomcuaNmWQFPkW/QKYUNU6kFf0NnByzqa3FnJ7xY3ru/RXWwOoBRowFuO1AAAAAElFTkSuQmCC"; 
+const FALLBACK_PINKSALE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEA0lEQVR4nO2aW4hVVRjHf+fMOINkpimZSRcVLBQvy7QIgqK7dKGHoi6UkC9FGPQQQRrSgw8+REVgQb1EXaAeKpAeoii6QWVQUYJYoqKWynibuXj+fPs71HYfc/Y+Z+2ZM9r54Vl77bP2/tb37fVd1odOOumkk/8hgDHAcuAQ0KHt17DvSqAnahR4BjgBdKdsR8VbjNNR4HVgTJAkEwrfCjwZwrn4lgIP6/9UYD3wewr7LPCcvhEj4BpgH/AJ0JzGwcQvEu8Y4GlgN/AZ8GCU0sFjwBZgoYVOY4yB+cDbwCFgPfBAkNTBoyz4M/AycGM5xloMGAssBjbJ6V7gsSDJg8cu4d8BrwA3p2NouoW6gVnAxsD5A8G7Md4SYJvwm1UNB4M5wB7hN6qX/Js0iTnAv8DzwI3AQ8A+4X8HJgbX+A6Zr5F7WvjDwLPAzcAC4Gfhu7WfCHzI2YTbFfoFCu+dOrj8lNZPZmF4LvCXcGeDGujWseVJYe8K2wuMDzz+5gg/CCyTspMLv5zR7pFvlv1SCL0uHXzlQ8iQxsl0YalC+0dhJ4QdkM3PETYZZTS8pQv7+cKKwqcWcd6n8+uhul8a3h7hXxY+kGWeM0LI9eqZI8L3CzslfETYX8JuE9anF1irAe+ScD8VXpOFDDmO0D4J2Qu8boxqmwfrP0U28NUxyDJH1tEnirLpUIaIzKYTGW/fCDuRsDNaLxb2iLD9wm4Jzbu2Fo/szdLB8BLXnuYp7qCe6dtejMGN0iX2XNrYhyWkPvA9gZOQxandGgBL6hsw/ag2n0ls1LG8r8iSVENCakCfAuuWBC5s9JpXMlp1Bv9XJL9kNMmQRgzTOjaBN2TakRQnK8GfFvZ4TtdvRrbPmobZ98fn/B5P4AN57kgSOpRDRDNwJkc7+11zbqzltoOvP8fHPJtYGokMvbzucoh4zhJBssOcr+VqoaZnLLyvKUaTdnZmoDGfjPkqy9elLHTPp06492p3z0NdJjZcXqdClsUU0qPvzKxqF23bVEmjJLEtxXN36BvzdexZjNC4mZ1ZmHPP9WmoA67PaxzzBXTIkPuA1/Qes2ttwDwhlpdo/Wbrb0GC6uq9Y+ptkVc+aSBsFCtnZMCy5FPuOWPVPQNCJqljbLT6W+aehWVKUfT1ml0GK9tkXzyIYvcncs1i971xvHrO35zjmImao55hv76MUwOSEwplG3qqy7Htr+lNsvBnqr1WR+06Na1n+pXbJcPFSjlmJpjqsHLNLpXJ3WX+fjFiZojnwpI1VxnC/hE7qi4R15xvqlmLVRKvpCQPpHx7MUrfGwtHqWfaR9S64BK/WBGlN9TebnpiLHX8JlDM4XtFp5NOOumkE0XHf1Ua7PxHQMbbAAAAAElFTkSuQmCC";
+
 interface CategoryData {
   categories: string[];
   categoryMinPrices: Record<string, number>;
@@ -26,6 +31,11 @@ const Home = () => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isRequestServiceModalOpen, setIsRequestServiceModalOpen] = useState(false);
   const { selectedItems, getTotal } = useStrategyBoard();
+  
+  // State for partner logo loading errors
+  const [dextoolsError, setDextoolsError] = useState(false);
+  const [dexScreenerError, setDexScreenerError] = useState(false);
+  const [pinkSaleError, setPinkSaleError] = useState(false);
 
   // Fetch categories from API
   const { data: categoriesData, isLoading, error } = useQuery<CategoryData>({
@@ -206,9 +216,10 @@ const Home = () => {
                       <div className="flex flex-col items-center">
                         <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
                           <img 
-                            src="/branding/dext.png" 
+                            src={dextoolsError ? FALLBACK_DEXTOOLS : "/branding/dext.png"}
                             alt="DEXTools" 
                             className="max-w-full max-h-full object-contain"
+                            onError={() => setDextoolsError(true)}
                           />
                         </div>
                         <span className="mt-2 text-gray-300 font-medium">DEXTools</span>
@@ -217,9 +228,10 @@ const Home = () => {
                       <div className="flex flex-col items-center">
                         <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
                           <img 
-                            src="/branding/dex.png" 
+                            src={dexScreenerError ? FALLBACK_DEXSCREENER : "/branding/dex.png"}
                             alt="DEX Screener" 
                             className="max-w-full max-h-full object-contain"
+                            onError={() => setDexScreenerError(true)}
                           />
                         </div>
                         <span className="mt-2 text-gray-300 font-medium">DEX Screener</span>
@@ -228,9 +240,10 @@ const Home = () => {
                       <div className="flex flex-col items-center">
                         <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
                           <img 
-                            src="/branding/pink.png" 
+                            src={pinkSaleError ? FALLBACK_PINKSALE : "/branding/pink.png"}
                             alt="PinkSale" 
                             className="max-w-full max-h-full object-contain"
+                            onError={() => setPinkSaleError(true)}
                           />
                         </div>
                         <span className="mt-2 text-gray-300 font-medium">PinkSale</span>
