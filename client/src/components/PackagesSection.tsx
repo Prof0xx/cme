@@ -43,8 +43,8 @@ const PackagesSection = () => {
               <span className={`${packageDetails.budget.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>10% OFF</span>
             </div>
             <div className="flex items-baseline mb-4">
-              <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(1985)}</span>
-              <span className="text-white text-2xl font-bold">{formatPrice(1687)}</span>
+              <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(packageDetails.budget.originalPrice)}</span>
+              <span className="text-white text-2xl font-bold">{formatPrice(packageDetails.budget.discountedPrice)}</span>
             </div>
             <Button
               onClick={() => handleSelectPackage('budget')}
@@ -74,8 +74,8 @@ const PackagesSection = () => {
               <span className={`${packageDetails.baller.discountBadgeClassName} text-xs font-medium px-2 py-1 rounded-full`}>10% OFF</span>
             </div>
             <div className="flex items-baseline mb-4">
-              <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(16930)}</span>
-              <span className="text-white text-2xl font-bold">{formatPrice(14390)}</span>
+              <span className="text-gray-400 text-lg line-through mr-2">{formatPrice(packageDetails.baller.originalPrice)}</span>
+              <span className="text-white text-2xl font-bold">{formatPrice(packageDetails.baller.discountedPrice)}</span>
             </div>
             <Button
               onClick={() => handleSelectPackage('baller')}
