@@ -227,51 +227,72 @@ const Home = () => {
                     
                     <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16">
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-800 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
-                          <img 
-                            src={dextoolsLogo}
-                            alt="DEXTools" 
-                            className="max-w-full max-h-full object-contain z-10"
-                            onLoad={() => console.log("DEXTools logo loaded successfully")}
-                            onError={(e) => {
-                              console.error("DEXTools logo failed to load:", e);
-                              setDextoolsError(true);
-                            }}
-                          />
-                        </div>
-                        <span className="mt-2 text-gray-300 font-medium">DEXTools</span>
+                        <a 
+                          href="https://www.dextools.io/app/en/pairs"
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="hover:scale-105 transition-transform duration-300"
+                        >
+                          <div className="bg-gray-700 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-700 hover:border-primary-600/50 transition-all duration-300 shadow-md hover:shadow-lg relative">
+                            <img 
+                              src={dextoolsLogo}
+                              alt="DEXTools" 
+                              className="max-w-full max-h-full object-contain z-10"
+                              onLoad={() => console.log("DEXTools logo loaded successfully")}
+                              onError={(e) => {
+                                console.error("DEXTools logo failed to load:", e);
+                                setDextoolsError(true);
+                              }}
+                            />
+                          </div>
+                          <span className="mt-2 text-gray-300 font-medium text-center block">DEXTools</span>
+                        </a>
                       </div>
                       
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-800 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
-                          <img 
-                            src={dexScreenerLogo}
-                            alt="DEX Screener" 
-                            className="max-w-[105%] max-h-[105%] scale-110 object-contain z-10"
-                            onLoad={() => console.log("DEX Screener logo loaded successfully")}
-                            onError={(e) => {
-                              console.error("DEX Screener logo failed to load:", e);
-                              setDexScreenerError(true);
-                            }}
-                          />
-                        </div>
-                        <span className="mt-2 text-gray-300 font-medium">DEX Screener</span>
+                        <a 
+                          href="https://dexscreener.com/"
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="hover:scale-105 transition-transform duration-300"
+                        >
+                          <div className="bg-gray-700 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-700 hover:border-primary-600/50 transition-all duration-300 shadow-md hover:shadow-lg relative">
+                            <img 
+                              src={dexScreenerLogo}
+                              alt="DEX Screener" 
+                              className="max-w-[105%] max-h-[105%] scale-110 object-contain z-10"
+                              onLoad={() => console.log("DEX Screener logo loaded successfully")}
+                              onError={(e) => {
+                                console.error("DEX Screener logo failed to load:", e);
+                                setDexScreenerError(true);
+                              }}
+                            />
+                          </div>
+                          <span className="mt-2 text-gray-300 font-medium text-center block">DEX Screener</span>
+                        </a>
                       </div>
                       
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-800 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
-                          <img 
-                            src={pinkSaleLogo}
-                            alt="PinkSale" 
-                            className="max-w-full max-h-full object-contain z-10"
-                            onLoad={() => console.log("PinkSale logo loaded successfully")}
-                            onError={(e) => {
-                              console.error("PinkSale logo failed to load:", e);
-                              setPinkSaleError(true);
-                            }}
-                          />
-                        </div>
-                        <span className="mt-2 text-gray-300 font-medium">PinkSale</span>
+                        <a 
+                          href="https://www.pinksale.finance/"
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="hover:scale-105 transition-transform duration-300"
+                        >
+                          <div className="bg-gray-700 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-700 hover:border-primary-600/50 transition-all duration-300 shadow-md hover:shadow-lg relative">
+                            <img 
+                              src={pinkSaleLogo}
+                              alt="PinkSale" 
+                              className="max-w-full max-h-full object-contain z-10"
+                              onLoad={() => console.log("PinkSale logo loaded successfully")}
+                              onError={(e) => {
+                                console.error("PinkSale logo failed to load:", e);
+                                setPinkSaleError(true);
+                              }}
+                            />
+                          </div>
+                          <span className="mt-2 text-gray-300 font-medium text-center block">PinkSale</span>
+                        </a>
                       </div>
                     </div>
                   </div>
