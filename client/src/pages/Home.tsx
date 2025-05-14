@@ -190,6 +190,56 @@ const Home = () => {
                 <PackagesSection />
               </div>
 
+              {/* Official Partners Section */}
+              <section className="mt-12 mb-12">
+                <div className="rounded-xl bg-gradient-to-b from-gray-800 to-gray-900 shadow-lg border border-gray-700 p-6 relative overflow-hidden">
+                  {/* Subtle background effect */}
+                  <div className="absolute -inset-[10px] bg-gradient-to-r from-primary-600/5 via-transparent to-primary-600/5 opacity-30 blur-3xl"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-center mb-6">
+                      <h3 className="text-2xl font-semibold text-white">Official Partners</h3>
+                      <div className="ml-2 h-[1px] w-12 bg-gradient-to-r from-transparent via-primary-500/50 to-transparent"></div>
+                    </div>
+                    
+                    <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16">
+                      <div className="flex flex-col items-center">
+                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                          <img 
+                            src="/branding/dext png.png" 
+                            alt="DEXTools" 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                        <span className="mt-2 text-gray-300 font-medium">DEXTools</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-center">
+                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                          <img 
+                            src="/branding/dex png.png" 
+                            alt="DEX Screener" 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                        <span className="mt-2 text-gray-300 font-medium">DEX Screener</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-center">
+                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                          <img 
+                            src="/branding/pink.png" 
+                            alt="PinkSale" 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                        <span className="mt-2 text-gray-300 font-medium">PinkSale</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
               {/* Can't Find What You're Looking For Section */}
               <section className="mt-12 mb-16">
                 <div className="rounded-xl bg-gradient-to-b from-gray-800 to-gray-900 shadow-lg border border-gray-700 p-6 text-center relative overflow-hidden">
