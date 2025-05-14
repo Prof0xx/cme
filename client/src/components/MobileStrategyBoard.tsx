@@ -116,7 +116,7 @@ const MobileStrategyBoard = ({ onExpressInterest }: MobileStrategyBoardProps) =>
             </div>
             {isPackageSelected && (
               <div className="flex justify-between mb-2">
-                <span className="text-green-500">Discount (15%)</span>
+                <span className="text-green-500">Discount (10%)</span>
                 <span className="text-green-500">-${discount.toLocaleString()}</span>
               </div>
             )}
