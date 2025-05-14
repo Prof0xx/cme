@@ -227,9 +227,7 @@ const Home = () => {
                     
                     <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16">
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
-                          {/* Add debug border */}
-                          <div className="absolute inset-0 border border-red-500 opacity-30 rounded-xl z-0"></div>
+                        <div className="bg-gray-800 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
                           <img 
                             src={dextoolsLogo}
                             alt="DEXTools" 
@@ -245,13 +243,11 @@ const Home = () => {
                       </div>
                       
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
-                          {/* Add debug border */}
-                          <div className="absolute inset-0 border border-red-500 opacity-30 rounded-xl z-0"></div>
+                        <div className="bg-gray-800 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
                           <img 
                             src={dexScreenerLogo}
                             alt="DEX Screener" 
-                            className="max-w-full max-h-full object-contain z-10"
+                            className="max-w-[105%] max-h-[105%] scale-110 object-contain z-10"
                             onLoad={() => console.log("DEX Screener logo loaded successfully")}
                             onError={(e) => {
                               console.error("DEX Screener logo failed to load:", e);
@@ -263,9 +259,7 @@ const Home = () => {
                       </div>
                       
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
-                          {/* Add debug border */}
-                          <div className="absolute inset-0 border border-red-500 opacity-30 rounded-xl z-0"></div>
+                        <div className="bg-gray-800 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
                           <img 
                             src={pinkSaleLogo}
                             alt="PinkSale" 
