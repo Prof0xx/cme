@@ -206,7 +206,7 @@ const Home = () => {
                       <div className="flex flex-col items-center">
                         <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
                           <img 
-                            src="/branding/dext png.png" 
+                            src="/branding/dext.png" 
                             alt="DEXTools" 
                             className="max-w-full max-h-full object-contain"
                           />
@@ -217,7 +217,7 @@ const Home = () => {
                       <div className="flex flex-col items-center">
                         <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
                           <img 
-                            src="/branding/dex png.png" 
+                            src="/branding/dex.png" 
                             alt="DEX Screener" 
                             className="max-w-full max-h-full object-contain"
                           />
