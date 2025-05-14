@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ServiceCategory from "@/components/ServiceCategory";
 import ServiceList from "@/components/ServiceList";
@@ -13,6 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Flame, Zap, Rocket, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+
+// Direct imports of logo images
+import dextoolsLogo from "../assets/dext.png";
+import dexScreenerLogo from "../assets/dex.png";
+import pinkSaleLogo from "../assets/pink.png";
 
 // Base64 encoded fallback logos for partners
 const FALLBACK_DEXTOOLS = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABEUlEQVR4nO2ZMQ6DMAxFuQOVekZW7sDACXoBll7F7VDSgc2HPAu1UtOkJBZ88hCSPxHJl2cDlpVSKpVKRQLoADfQA82Cc4+Yi8QCWkTynBvtI3Kj58zBO6J9JKKkJeZEIJCsdxGJgMZGxIN+RH+rld3XuVciE7DfQKTn+aEbkez3VZM6B9vRn7YNBaJ9JKKkJeZEIJDm1cg/0s97JXIOt4NIr0oJgdb5HF2TOs0r4fsxPkSKbiO20l36xNwjIqndimT3QlNrYyXNI1J0ID1iDnvX3moFPgdSfhvZI+awN7anbSQgkLaRXUSS45+UnUBqt9Kt3QqBRNcoQNr1G9tGKkiqViqVSiUYFx8T+R2dvLkdAAAAAElFTkSuQmCC";
@@ -36,6 +41,14 @@ const Home = () => {
   const [dextoolsError, setDextoolsError] = useState(false);
   const [dexScreenerError, setDexScreenerError] = useState(false);
   const [pinkSaleError, setPinkSaleError] = useState(false);
+
+  // Debug logging for partner images
+  useEffect(() => {
+    console.log("Partner logos imported:");
+    console.log("DEXTools:", dextoolsLogo || "Not loaded");
+    console.log("DEX Screener:", dexScreenerLogo || "Not loaded");
+    console.log("PinkSale:", pinkSaleLogo || "Not loaded");
+  }, []);
 
   // Fetch categories from API
   const { data: categoriesData, isLoading, error } = useQuery<CategoryData>({
@@ -214,36 +227,54 @@ const Home = () => {
                     
                     <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16">
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
+                          {/* Add debug border */}
+                          <div className="absolute inset-0 border border-red-500 opacity-30 rounded-xl z-0"></div>
                           <img 
-                            src={dextoolsError ? FALLBACK_DEXTOOLS : "/branding/dext.png"}
+                            src={dextoolsLogo}
                             alt="DEXTools" 
-                            className="max-w-full max-h-full object-contain"
-                            onError={() => setDextoolsError(true)}
+                            className="max-w-full max-h-full object-contain z-10"
+                            onLoad={() => console.log("DEXTools logo loaded successfully")}
+                            onError={(e) => {
+                              console.error("DEXTools logo failed to load:", e);
+                              setDextoolsError(true);
+                            }}
                           />
                         </div>
                         <span className="mt-2 text-gray-300 font-medium">DEXTools</span>
                       </div>
                       
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
+                          {/* Add debug border */}
+                          <div className="absolute inset-0 border border-red-500 opacity-30 rounded-xl z-0"></div>
                           <img 
-                            src={dexScreenerError ? FALLBACK_DEXSCREENER : "/branding/dex.png"}
+                            src={dexScreenerLogo}
                             alt="DEX Screener" 
-                            className="max-w-full max-h-full object-contain"
-                            onError={() => setDexScreenerError(true)}
+                            className="max-w-full max-h-full object-contain z-10"
+                            onLoad={() => console.log("DEX Screener logo loaded successfully")}
+                            onError={(e) => {
+                              console.error("DEX Screener logo failed to load:", e);
+                              setDexScreenerError(true);
+                            }}
                           />
                         </div>
                         <span className="mt-2 text-gray-300 font-medium">DEX Screener</span>
                       </div>
                       
                       <div className="flex flex-col items-center">
-                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                        <div className="bg-gray-900 p-4 rounded-xl w-40 h-24 flex items-center justify-center border border-gray-800 hover:border-gray-700 transition-all duration-300 shadow-md hover:shadow-lg relative">
+                          {/* Add debug border */}
+                          <div className="absolute inset-0 border border-red-500 opacity-30 rounded-xl z-0"></div>
                           <img 
-                            src={pinkSaleError ? FALLBACK_PINKSALE : "/branding/pink.png"}
+                            src={pinkSaleLogo}
                             alt="PinkSale" 
-                            className="max-w-full max-h-full object-contain"
-                            onError={() => setPinkSaleError(true)}
+                            className="max-w-full max-h-full object-contain z-10"
+                            onLoad={() => console.log("PinkSale logo loaded successfully")}
+                            onError={(e) => {
+                              console.error("PinkSale logo failed to load:", e);
+                              setPinkSaleError(true);
+                            }}
                           />
                         </div>
                         <span className="mt-2 text-gray-300 font-medium">PinkSale</span>
