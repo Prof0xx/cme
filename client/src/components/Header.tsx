@@ -66,7 +66,7 @@ const Header = () => {
             </Button>
           </a>
           <a 
-            href="https://t.me/Prof0xx" 
+            href="https://t.me/BoostLabsSupport" 
             target="_blank" 
             rel="noopener noreferrer"
             aria-label="Contact us on Telegram"
